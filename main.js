@@ -16,12 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return response.text();
       })
       .then(html => {
-        topicContent.innerHTML = html;
-
-        // cargar el JS asociado al tema
-        const script = document.createElement('script');
-        script.src = `topics/${topic}.js`;
-        document.body.appendChild(script);
+        topicContent.innerHTML = html; // <- aquí se inserta el contenido
       })
       .catch(err => topicContent.innerHTML = `<p>Error: ${err.message}</p>`);
   });
