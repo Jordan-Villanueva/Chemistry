@@ -2,11 +2,11 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Curso de Química - Modelos Atómicos</title>
   
   <style>
-	/* ===============================
+    /* ===============================
        VARIABLES Y BASE GLOBAL
     =============================== */
     :root { 
@@ -27,7 +27,6 @@
       line-height: 1.5;
       color: #123;
       background: linear-gradient(#f7fbfb, #eef6f6);
-      -webkit-text-size-adjust: 100%;
     }
 
     .small { font-size: 0.85rem; color: var(--muted); }
@@ -88,7 +87,6 @@
       font-size: 1rem;
       color: #123;
       transition: all 0.2s;
-      -webkit-tap-highlight-color: transparent;
     }
     .model-btn:hover {
       border-color: var(--accent);
@@ -101,28 +99,21 @@
     }
 
     /* ===============================
-       ÁREA DE VISUALIZACIÓN
+       CONTENEDOR DE ANIMACIÓN INDEPENDIENTE
     =============================== */
-    .vis-area {
-      display: flex;
-      flex-direction: column; 
-      gap: 14px;
-    }
-    
-    .canvas-container {
-      position: relative;
+    .animation-container {
       width: 100%;
+      margin: 16px 0;
+      border-radius: 8px;
       overflow: hidden;
-      background: linear-gradient(#fff,#fbffff); 
-      border-radius: 6px;
+      background: linear-gradient(#fff,#fbffff);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     
-    canvas {
+    #visCanvas {
       display: block;
-      width: 100% !important;
-      height: auto !important;
-      max-height: 50vh;
-      touch-action: manipulation;
+      width: 100%;
+      height: auto;
     }
 
     /* ===============================
@@ -132,6 +123,7 @@
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
+      margin-bottom: 12px;
     }
     .btn {
       padding: 10px 12px;
@@ -141,8 +133,6 @@
       color: white;
       cursor: pointer;
       font-size: 0.95rem;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
     }
     .btn:hover { background: #1f5f5d; }
 
@@ -164,7 +154,6 @@
       background: #fff;
       cursor: pointer;
       transition: all 0.2s;
-      -webkit-tap-highlight-color: transparent;
     }
     .choice:hover { border-color: var(--accent); }
     .choice.selected {
@@ -173,7 +162,7 @@
     }
 
     /* ===============================
-       VIDEO RESPONSIVO MEJORADO
+       VIDEO RESPONSIVO
     =============================== */
     .video-container {
       position: relative;
@@ -192,7 +181,18 @@
     }
 
     /* ===============================
-       MODO MÓVIL MEJORADO - CORREGIDO
+       ÁREA DE INFORMACIÓN
+    =============================== */
+    .info-panel {
+      background: var(--card);
+      border-radius: 10px;
+      padding: 16px;
+      margin: 16px 0;
+      box-shadow: 0 2px 6px rgba(10,10,10,0.06);
+    }
+
+    /* ===============================
+       MODO MÓVIL MEJORADO
     =============================== */
     @media (max-width: 900px){ 
       .layout { 
@@ -204,7 +204,6 @@
         text-align: center; 
         justify-content: center; 
         flex-direction: column;
-        gap: 8px;
       }
       
       .header h1 {
@@ -214,63 +213,33 @@
       
       .controls { 
         justify-content: center; 
-        flex-wrap: wrap; 
-        gap: 8px;
       }
       
       .panel { 
         padding: 16px; 
-        width: 100%;
       }
 
-      /* Lista de modelos ocupa todo el ancho */
+      /* Lista de modelos */
       .models-list { 
         width: 100%; 
-        gap: 8px;
       }
 
       /* Botones más grandes y cómodos */
       .model-btn, .btn, .mutebtn {
         font-size: 1.1rem;
-        padding: 14px 16px;
-        min-height: 50px;
+        padding: 14px;
       }
 
       /* Canvas se ajusta al ancho del panel */
-      .canvas-container {
+      .animation-container {
         width: 100%;
         height: auto;
         min-height: 250px;
       }
       
-      canvas {
+      #visCanvas {
         width: 100% !important;
         height: auto !important;
-        min-height: 250px;
-      }
-
-      /* REORGANIZACIÓN CRÍTICA: Separar la animación del panel lateral */
-      .vis-area > div:last-child {
-        flex-direction: column !important;
-      }
-      
-      /* El canvas ocupa todo el ancho */
-      .vis-area > div:last-child > div:first-child {
-        width: 100% !important;
-        flex: none !important;
-      }
-      
-      /* El panel de información va DEBAJO, no al lado */
-      .vis-area > div:last-child > div:last-child {
-        width: 100% !important;
-        margin-top: 20px;
-        margin-left: 0 !important;
-      }
-      
-      /* Aseguramos que los elementos internos se muestren correctamente */
-      .vis-area > div:last-child > div:last-child .panel {
-        width: 100%;
-        margin-top: 15px;
       }
 
       /* Videos responsivos */
@@ -282,47 +251,7 @@
       .choices .choice { 
         width: 100%; 
         font-size: 1rem; 
-        padding: 14px; 
-        min-height: 50px;
-        display: flex;
-        align-items: center;
-      }
-      
-      /* Mejora para los controles de Rutherford */
-      .control-row {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        margin-bottom: 12px;
-      }
-      
-      .control-row input[type="range"] {
-        width: 100%;
-      }
-    }
-    
-    /* Ajustes adicionales para pantallas muy pequeñas */
-    @media (max-width: 480px) {
-      body {
-        padding: 12px;
-      }
-      
-      .panel {
-        padding: 12px;
-        border-radius: 8px;
-      }
-      
-      .model-btn, .btn, .mutebtn, .choice {
-        font-size: 1rem;
-        padding: 12px;
-      }
-      
-      .header h1 {
-        font-size: 1.4rem;
-      }
-      
-      .canvas-container {
-        min-height: 200px;
+        padding: 12px; 
       }
     }
 
@@ -381,35 +310,31 @@
         </div>
       </div>
 
-      <!-- ESTA ES LA SECCIÓN CLAVE A MODIFICAR -->
-      <div style="display:flex;gap:8px" class="animation-container">
-        <div style="flex:1">
-          <div class="canvas-container">
-            <canvas id="visCanvas" width="800" height="420"></canvas>
-          </div>
-        </div>
-        <div style="width:280px" class="info-panel">
-          <div class="panel" style="padding:8px">
-            <strong>Información breve</strong>
-            <p id="modelDesc" class="small">Selecciona un modelo para ver su descripción.</p>
-            <hr>
-            <strong>Conceptos clave</strong>
-            <ul id="modelConcepts" class="small" style="padding-left:18px"></ul>
-          </div>
-        </div>
+      <!-- PANEL DE INFORMACIÓN (arriba) -->
+      <div class="info-panel">
+        <strong>Información breve</strong>
+        <p id="modelDesc" class="small">Selecciona un modelo para ver su descripción.</p>
+        <hr>
+        <strong>Conceptos clave</strong>
+        <ul id="modelConcepts" class="small" style="padding-left:18px"></ul>
       </div>
 
+      <!-- CONTENEDOR DE ANIMACIÓN INDEPENDIENTE (medio) -->
+      <div class="animation-container">
+        <canvas id="visCanvas" width="800" height="420"></canvas>
+      </div>
+
+      <!-- CONTROLES ADICIONALES Y VIDEOS (abajo) -->
       <div id="extraControls" style="margin-top:8px" class="small"></div>
     </div>
   </div>
-
 
   <script>
     /* Datos de modelos */
     const MODELS = [
       { id:'dalton', title:'John Dalton (Modelo Dalton)', year:'Principios del s. XIX', desc:'Átomos como partículas indivisibles y características de cada elemento. No explica cargas ni estructuras internas.', concepts:['Átomos indivisibles','Cada elemento tiene átomos iguales entre sí','Compuestos = combinación de átomos en proporciones'], exercise:{type:'mcq',question:'¿Cuál de las siguientes afirmaciones pertenece al modelo de Dalton?',options:['Los átomos son indivisibles y conservan sus propiedades al formar compuestos.','Los electrones están incrustados en una "sopa" positiva.','Los electrones ocupan orbitales difusos con probabilidades.'],answer:0,explanation:'Dalton planteó átomos como unidades indivisibles y que combinan en proporciones fijas para formar compuestos.'} },
       { id:'thomson', title:'J. J. Thomson (Modelo "Plum pudding")', year:'1897–1904', desc:'Descubrimiento del electrón; modelo con carga positiva difusa y electrones incrustados.', concepts:['Existencia de electrones','Carga positiva extendida','Electrones incrustados (como pasas)'], exercise:{type:'mcq',question:'¿Qué experimento llevó al descubrimiento del electrón y apoyó el modelo de Thomson?',options:['Descarga en tubos de rayos catódicos','Dispersión de partículas alfa','Espectros de líneas'],answer:0,explanation:'Los tubos de rayos catódicos mostraron partículas negativas (electrones).'} },
-      { id:'rutherford', title:'Ernest Rutherford (Modelo nuclear)', year:'1911', desc:'Experimentos de la lámina de oro mostraron una región pequeña y densa (núcleo) con carga positiva. La mayor parte del átomo es espacio vacío.', concepts:['Núcleo pequeño, denso y positivo','Electrones alrededor en gran espacio vacío','Explica grandes ángulos de dispersión'], exercise:{type:'sim',question:'Simula partículas alfa disparadas contra un núcleo. ¿Qué observas cuando las partículas pasan cerca del núcleo?',options:[],answer:null,explanation:'Partículas que pasan cerca del núcleo se desvían fuertemente; las que pasan lejos continuan casi rectas.'} },
+      { id:'rutherford', title:'Ernest Rutherford (Modelo nuclear)', year:'1911', desc:'Experimentos de la lámina de oro mostraron una región pequeña y densa (núcleo) con carga positiva. La mayor parte del átomo es espacio vacío.', concepts:['Núcleo pequeño, denso y positivo','Electrones alrededor en gran espacio vacío','Explica grandes ángulos de dispersión'], exercise:{type:'sim',question:'Simula partículas alfa disparadas contra un núcleo. ¿Qué observas cuando las partículas pasan cerca del núcleo?',options:[],answer:null,explanation:'Partículas que pasan cerca del núcleo se desvían fuertemente; las que pasan lejos continúan casi rectas.'} },
       { id:'bohr', title:'Niels Bohr (Modelo de Bohr)', year:'1913', desc:'Electrones en órbitas circulares cuantizadas. Explica las líneas espectrales del hidrógeno mediante transiciones entre niveles.', concepts:['Órbitas cuantizadas','Emisión/absorción por transiciones (ΔE = E2 - E1)','Explicación de espectro de H'], exercise:{type:'calc',question:'Calcula la energía (in eV) emitida cuando un electrón en H pasa de n=3 to n=2. (E_n = -13.6 eV / n^2)',options:[],answer:null,explanation:'Use E_n = -13.6/n^2. ΔE = E2 - E3 = (-13.6/2^2) - (-13.6/3^2) = ...'} },
       { id:'schrodinger', title:'Erwin Schrödinger (Modelo cuántico / mecánico ondulatorio)', year:'1926', desc:'Electrones descritos por funciones de onda; aparecen orbitales con probabilidades (números cuánticos).', concepts:['Función de onda ψ','Orbitales con densidad de probabilidad |ψ|^2','Explica estructuras más complejas'], exercise:{type:'mcq',question:'En el modelo de Schrödinger, ¿qué representa |ψ|^2?',options:['La densidad de probabilidad de encontrar el electrón en una región','La trayectoria exacta del electrón','La energía del núcleo'],answer:0,explanation:'|ψ|^2 es la densidad de probabilidad derivada de la función de onda ψ.'} },
       { id:'actual', title:'Modelo Actual (Orbitales y QED simplificado)', year:'Siglo XX–XXI', desc:'Combinación del modelo de orbitales cuánticos con efectos relativistas y correcciones de interacción campo-cuanto; se habla de orbitales, espín y principios de exclusión.', concepts:['Orbitales atómicos (mecánica cuántica)','Spin y estadísticas cuánticas','Correcciones: relativistas y QED'], exercise:{type:'mcq',question:'¿Qué concepto es parte del modelo atómico moderno?',options:['Orbitales con probabilidades','Átomos indivisibles sin estructura','Electrones incrustados en "sopa positiva"'],answer:0,explanation:'El modelo moderno utiliza orbitales cuánticos (densidades de probabilidad).'} }
@@ -448,7 +373,7 @@
 
     // Ajustar tamaño del canvas según dispositivo
     function resizeCanvas() {
-      const container = document.querySelector('.canvas-container');
+      const container = document.querySelector('.animation-container');
       const displayWidth = container.clientWidth;
       
       // Mantener la relación de aspecto original (800/420 ≈ 1.9)

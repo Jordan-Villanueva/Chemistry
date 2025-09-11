@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configuraciones Electrónicas y Números Cuánticos</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background: #f7f9fc;
+    color: #1a237e;
+  }
+  h1, h2 { text-align: center; }
+  .panel { 
+    background: #fff; 
+    padding: 20px; 
+    border-radius: 10px; 
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+  }
+  select { padding: 5px 10px; font-size: 1rem; margin-bottom: 10px; }
+  .output { 
+    margin-top: 20px; 
+    padding: 10px; 
+    background: #e8eaf6; 
+    border-radius: 5px; 
+    white-space: pre-wrap; 
+    font-family: monospace;
+  }
+  .orbital-diagram {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 15px;
+  }
+  .orbital {
+    width: 60px;
+    text-align: center;
+    padding: 10px;
+    border-radius: 5px;
+    background: #c5cae9; /* color base */
+    color: #1a237e;
+    user-select: none;
+    position: relative;
+  }
+  .orbital span { display: block; font-size: 0.8rem; }
+  .orbital .fill {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #3f51b5;
+    border-radius: 0 0 5px 5px;
+    color: white;
+    text-align: center;
+    font-size: 0.8rem;
+  }
+  
+  .orbital {
+    width: 60px;
+    text-align: center;
+    padding: 10px;
+    border-radius: 5px;
+    background: #c5cae9;
+    color: #1a237e;
+    user-select: none;
+    position: relative;
+    font-weight: bold;
+  }
+  .orbital span { display: block; font-size: 0.8rem; }
+  .orbital .fill {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #3f51b5;
+    border-radius: 0 0 5px 5px;
+    color: white;
+    text-align: center;
+    font-size: 0.8rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+</style>
+</head>
+<body>
+
+<h1>Configuraciones Electrónicas y Números Cuánticos</h1>
+
+<div class="panel">
+  <h2>Selecciona un elemento</h2>
+  <select id="elementSelect">
+    <option value="">--Elige un elemento--</option>
+  </select>
+  <div class="output" id="configurationOutput">
+    Aquí aparecerá la configuración electrónica.
+  </div>
+</div>
+
+<div class="panel">
+  <h2>Diagrama de Orbitales</h2>
+  <div class="orbital-diagram" id="orbitalDiagram"></div>
+</div>
+
+<script>
+const elements = {
+  "H": 1, "He": 2, "Li": 3, "Be": 4, "B": 5, "C": 6, "N": 7, "O": 8,
+  "F": 9, "Ne": 10, "Na": 11, "Mg": 12, "Al": 13, "Si": 14, "P": 15,
+  "S": 16, "Cl": 17, "Ar": 18
+};
+
+const aufbauOrder = [
+  {orbital: "1s", n:1, l:0}, {orbital: "2s", n:2, l:0}, {orbital: "2p", n:2, l:1},
+  {orbital: "3s", n:3, l:0}, {orbital: "3p", n:3, l:1}, {orbital: "4s", n:4, l:0},
+  {orbital: "3d", n:3, l:2}, {orbital: "4p", n:4, l:1}, {orbital: "5s", n:5, l:0},
+  {orbital: "4d", n:4, l:2}, {orbital: "5p", n:5, l:1}, {orbital: "6s", n:6, l:0},
+  {orbital: "4f", n:4, l:3}, {orbital: "5d", n:5, l:2}, {orbital: "6p", n:6, l:1},
+  {orbital: "7s", n:7, l:0}
+];
+
+const orbitalCapacity = { "s":2, "p":6, "d":10, "f":14 };
+
+const elementSelect = document.getElementById('elementSelect');
+const configOutput = document.getElementById('configurationOutput');
+const diagram = document.getElementById('orbitalDiagram');
+
+// Llenar select
+Object.keys(elements).forEach(sym => {
+  const option = document.createElement('option');
+  option.value = sym;
+  option.textContent = `${sym} (${elements[sym]} e⁻)`;
+  elementSelect.appendChild(option);
+});
+
+function generateConfiguration(electrons) {
+  let remaining = electrons;
+  const config = [];
+  aufbauOrder.forEach(o => {
+    const type = o.orbital[1];
+    const cap = orbitalCapacity[type];
+    const eCount = Math.min(remaining, cap);
+    if(eCount>0){
+      config.push({orbital:o.orbital, electrons:eCount, n:o.n, l:o.l, capacity: cap});
+      remaining -= eCount;
+    }
+  });
+  return config;
+}
+
+function displayDiagram(config) {
+  diagram.innerHTML = '';
+  config.forEach(o => {
+    const div = document.createElement('div');
+    div.classList.add('orbital');
+
+    // Nombre del orbital
+    const orbitalLabel = document.createElement('strong');
+    orbitalLabel.textContent = o.orbital;
+    div.appendChild(orbitalLabel);
+
+    // Números cuánticos arriba de la barra
+    const quantumSpan = document.createElement('span');
+    quantumSpan.style.fontSize = "0.7em";
+    quantumSpan.textContent = `n=${o.n}, l=${o.l}`;
+    div.appendChild(quantumSpan);
+
+    // Contenedor de barra
+    const barContainer = document.createElement('div');
+    barContainer.style.width = "100%";
+    barContainer.style.height = "40px";
+    barContainer.style.background = "#e8eaf6";
+    barContainer.style.borderRadius = "5px";
+    barContainer.style.position = "relative";
+    barContainer.style.marginTop = "5px";
+
+    // Barra de llenado
+    const fillDiv = document.createElement('div');
+    fillDiv.style.height = "100%";
+    fillDiv.style.width = `${(o.electrons/o.capacity)*100}%`;
+    fillDiv.style.background = `linear-gradient(to top, #3f51b5, #7986cb)`;
+    fillDiv.style.borderRadius = "5px";
+    fillDiv.style.display = "flex";
+    fillDiv.style.alignItems = "center";
+    fillDiv.style.justifyContent = "center";
+    fillDiv.style.color = "white";
+    fillDiv.textContent = `${o.electrons}/${o.capacity}`;
+
+    barContainer.appendChild(fillDiv);
+    div.appendChild(barContainer);
+
+    diagram.appendChild(div);
+  });
+}
+
+
+
+
+elementSelect.addEventListener('change', () => {
+  const el = elementSelect.value;
+  if(el && elements[el]){
+    const config = generateConfiguration(elements[el]);
+    configOutput.textContent = config.map(c => `${c.orbital}${'^'+c.electrons}`).join(' ');
+    displayDiagram(config);
+  } else {
+    configOutput.textContent = "Aquí aparecerá la configuración electrónica.";
+    diagram.innerHTML = '';
+  }
+});
+</script>
+
+</body>
+</html>
+
