@@ -1,0 +1,14 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 24px;
+}
+
+#mainMenu {
+  margin-bottom: 24px;
+}
+
+#topicContent video {
+  display: block;
+  margin-top: 12px;
+}
+
