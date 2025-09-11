@@ -2,11 +2,11 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Curso de Química - Modelos Atómicos</title>
   
   <style>
-    /* ===============================
+	/* ===============================
        VARIABLES Y BASE GLOBAL
     =============================== */
     :root { 
@@ -27,6 +27,7 @@
       line-height: 1.5;
       color: #123;
       background: linear-gradient(#f7fbfb, #eef6f6);
+      -webkit-text-size-adjust: 100%;
     }
 
     .small { font-size: 0.85rem; color: var(--muted); }
@@ -87,6 +88,7 @@
       font-size: 1rem;
       color: #123;
       transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
     }
     .model-btn:hover {
       border-color: var(--accent);
@@ -106,11 +108,21 @@
       flex-direction: column; 
       gap: 14px;
     }
-    canvas {
-      width: 100%; 
+    
+    .canvas-container {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
       background: linear-gradient(#fff,#fbffff); 
-      border-radius: 6px; 
+      border-radius: 6px;
+    }
+    
+    canvas {
       display: block;
+      width: 100% !important;
+      height: auto !important;
+      max-height: 50vh;
+      touch-action: manipulation;
     }
 
     /* ===============================
@@ -129,6 +141,8 @@
       color: white;
       cursor: pointer;
       font-size: 0.95rem;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
     .btn:hover { background: #1f5f5d; }
 
@@ -150,6 +164,7 @@
       background: #fff;
       cursor: pointer;
       transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
     }
     .choice:hover { border-color: var(--accent); }
     .choice.selected {
@@ -158,7 +173,7 @@
     }
 
     /* ===============================
-       VIDEO RESPONSIVO
+       VIDEO RESPONSIVO MEJORADO
     =============================== */
     .video-container {
       position: relative;
@@ -176,39 +191,140 @@
       border: none;
     }
 
-	    /* ===============================
-	   MODO MÓVIL MEJORADO
-	=============================== */
-	@media (max-width: 900px){ 
-	  .layout { grid-template-columns: 1fr; }
-	  .header { text-align: center; justify-content: center; }
-	  .controls { justify-content: center; flex-wrap: wrap; }
-	  .panel { padding: 16px; }
+    /* ===============================
+       MODO MÓVIL MEJORADO - CORREGIDO
+    =============================== */
+    @media (max-width: 900px){ 
+      .layout { 
+        grid-template-columns: 1fr; 
+        gap: 16px;
+      }
+      
+      .header { 
+        text-align: center; 
+        justify-content: center; 
+        flex-direction: column;
+        gap: 8px;
+      }
+      
+      .header h1 {
+        font-size: 1.6rem;
+        text-align: center;
+      }
+      
+      .controls { 
+        justify-content: center; 
+        flex-wrap: wrap; 
+        gap: 8px;
+      }
+      
+      .panel { 
+        padding: 16px; 
+        width: 100%;
+      }
 
-	  /* Lista de modelos ocupa todo el ancho */
-	  .models-list { width: 100%; }
+      /* Lista de modelos ocupa todo el ancho */
+      .models-list { 
+        width: 100%; 
+        gap: 8px;
+      }
 
-	  /* Botones más grandes y cómodos */
-	  .model-btn, .btn, .mutebtn {
-	    font-size: 1.1rem;
-	    padding: 14px;
-	  }
+      /* Botones más grandes y cómodos */
+      .model-btn, .btn, .mutebtn {
+        font-size: 1.1rem;
+        padding: 14px 16px;
+        min-height: 50px;
+      }
 
-	  /* Canvas se ajusta al ancho del panel */
-	  canvas {
-	    width: 100% !important;
-	    height: auto;
-	  }
+      /* Canvas se ajusta al ancho del panel */
+      .canvas-container {
+        width: 100%;
+        height: auto;
+        min-height: 250px;
+      }
+      
+      canvas {
+        width: 100% !important;
+        height: auto !important;
+        min-height: 250px;
+      }
 
-	  /* Videos responsivos (ya lo tienes, solo reforzar) */
-	  .video-container iframe {
-	    width: 100%;
-	    height: auto;
-	  }
+      /* REORGANIZACIÓN CRÍTICA: Separar la animación del panel lateral */
+      .vis-area > div:last-child {
+        flex-direction: column !important;
+      }
+      
+      /* El canvas ocupa todo el ancho */
+      .vis-area > div:last-child > div:first-child {
+        width: 100% !important;
+        flex: none !important;
+      }
+      
+      /* El panel de información va DEBAJO, no al lado */
+      .vis-area > div:last-child > div:last-child {
+        width: 100% !important;
+        margin-top: 20px;
+        margin-left: 0 !important;
+      }
+      
+      /* Aseguramos que los elementos internos se muestren correctamente */
+      .vis-area > div:last-child > div:last-child .panel {
+        width: 100%;
+        margin-top: 15px;
+      }
 
-	  /* Ejercicios: las opciones ocupan todo el ancho */
-	  .choices .choice { width: 100%; font-size: 1rem; padding: 12px; }
-	}
+      /* Videos responsivos */
+      .video-container {
+        margin: 16px 0;
+      }
+
+      /* Ejercicios: las opciones ocupan todo el ancho */
+      .choices .choice { 
+        width: 100%; 
+        font-size: 1rem; 
+        padding: 14px; 
+        min-height: 50px;
+        display: flex;
+        align-items: center;
+      }
+      
+      /* Mejora para los controles de Rutherford */
+      .control-row {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 12px;
+      }
+      
+      .control-row input[type="range"] {
+        width: 100%;
+      }
+    }
+    
+    /* Ajustes adicionales para pantallas muy pequeñas */
+    @media (max-width: 480px) {
+      body {
+        padding: 12px;
+      }
+      
+      .panel {
+        padding: 12px;
+        border-radius: 8px;
+      }
+      
+      .model-btn, .btn, .mutebtn, .choice {
+        font-size: 1rem;
+        padding: 12px;
+      }
+      
+      .header h1 {
+        font-size: 1.4rem;
+      }
+      
+      .canvas-container {
+        min-height: 200px;
+      }
+    }
 
   </style>
 </head>
@@ -265,11 +381,14 @@
         </div>
       </div>
 
-      <div style="display:flex;gap:8px">
+      <!-- ESTA ES LA SECCIÓN CLAVE A MODIFICAR -->
+      <div style="display:flex;gap:8px" class="animation-container">
         <div style="flex:1">
-          <canvas id="visCanvas" width="800" height="420"></canvas>
+          <div class="canvas-container">
+            <canvas id="visCanvas" width="800" height="420"></canvas>
+          </div>
         </div>
-        <div style="width:280px">
+        <div style="width:280px" class="info-panel">
           <div class="panel" style="padding:8px">
             <strong>Información breve</strong>
             <p id="modelDesc" class="small">Selecciona un modelo para ver su descripción.</p>
@@ -290,7 +409,7 @@
     const MODELS = [
       { id:'dalton', title:'John Dalton (Modelo Dalton)', year:'Principios del s. XIX', desc:'Átomos como partículas indivisibles y características de cada elemento. No explica cargas ni estructuras internas.', concepts:['Átomos indivisibles','Cada elemento tiene átomos iguales entre sí','Compuestos = combinación de átomos en proporciones'], exercise:{type:'mcq',question:'¿Cuál de las siguientes afirmaciones pertenece al modelo de Dalton?',options:['Los átomos son indivisibles y conservan sus propiedades al formar compuestos.','Los electrones están incrustados en una "sopa" positiva.','Los electrones ocupan orbitales difusos con probabilidades.'],answer:0,explanation:'Dalton planteó átomos como unidades indivisibles y que combinan en proporciones fijas para formar compuestos.'} },
       { id:'thomson', title:'J. J. Thomson (Modelo "Plum pudding")', year:'1897–1904', desc:'Descubrimiento del electrón; modelo con carga positiva difusa y electrones incrustados.', concepts:['Existencia de electrones','Carga positiva extendida','Electrones incrustados (como pasas)'], exercise:{type:'mcq',question:'¿Qué experimento llevó al descubrimiento del electrón y apoyó el modelo de Thomson?',options:['Descarga en tubos de rayos catódicos','Dispersión de partículas alfa','Espectros de líneas'],answer:0,explanation:'Los tubos de rayos catódicos mostraron partículas negativas (electrones).'} },
-      { id:'rutherford', title:'Ernest Rutherford (Modelo nuclear)', year:'1911', desc:'Experimentos de la lámina de oro mostraron una región pequeña y densa (núcleo) con carga positiva. La mayor parte del átomo es espacio vacío.', concepts:['Núcleo pequeño, denso y positivo','Electrones alrededor en gran espacio vacío','Explica grandes ángulos de dispersión'], exercise:{type:'sim',question:'Simula partículas alfa disparadas contra un núcleo. ¿Qué observas cuando las partículas pasan cerca del núcleo?',options:[],answer:null,explanation:'Partículas que pasan cerca del núcleo se desvían fuertemente; las que pasan lejos continúan casi rectas.'} },
+      { id:'rutherford', title:'Ernest Rutherford (Modelo nuclear)', year:'1911', desc:'Experimentos de la lámina de oro mostraron una región pequeña y densa (núcleo) con carga positiva. La mayor parte del átomo es espacio vacío.', concepts:['Núcleo pequeño, denso y positivo','Electrones alrededor en gran espacio vacío','Explica grandes ángulos de dispersión'], exercise:{type:'sim',question:'Simula partículas alfa disparadas contra un núcleo. ¿Qué observas cuando las partículas pasan cerca del núcleo?',options:[],answer:null,explanation:'Partículas que pasan cerca del núcleo se desvían fuertemente; las que pasan lejos continuan casi rectas.'} },
       { id:'bohr', title:'Niels Bohr (Modelo de Bohr)', year:'1913', desc:'Electrones en órbitas circulares cuantizadas. Explica las líneas espectrales del hidrógeno mediante transiciones entre niveles.', concepts:['Órbitas cuantizadas','Emisión/absorción por transiciones (ΔE = E2 - E1)','Explicación de espectro de H'], exercise:{type:'calc',question:'Calcula la energía (in eV) emitida cuando un electrón en H pasa de n=3 to n=2. (E_n = -13.6 eV / n^2)',options:[],answer:null,explanation:'Use E_n = -13.6/n^2. ΔE = E2 - E3 = (-13.6/2^2) - (-13.6/3^2) = ...'} },
       { id:'schrodinger', title:'Erwin Schrödinger (Modelo cuántico / mecánico ondulatorio)', year:'1926', desc:'Electrones descritos por funciones de onda; aparecen orbitales con probabilidades (números cuánticos).', concepts:['Función de onda ψ','Orbitales con densidad de probabilidad |ψ|^2','Explica estructuras más complejas'], exercise:{type:'mcq',question:'En el modelo de Schrödinger, ¿qué representa |ψ|^2?',options:['La densidad de probabilidad de encontrar el electrón en una región','La trayectoria exacta del electrón','La energía del núcleo'],answer:0,explanation:'|ψ|^2 es la densidad de probabilidad derivada de la función de onda ψ.'} },
       { id:'actual', title:'Modelo Actual (Orbitales y QED simplificado)', year:'Siglo XX–XXI', desc:'Combinación del modelo de orbitales cuánticos con efectos relativistas y correcciones de interacción campo-cuanto; se habla de orbitales, espín y principios de exclusión.', concepts:['Orbitales atómicos (mecánica cuántica)','Spin y estadísticas cuánticas','Correcciones: relativistas y QED'], exercise:{type:'mcq',question:'¿Qué concepto es parte del modelo atómico moderno?',options:['Orbitales con probabilidades','Átomos indivisibles sin estructura','Electrones incrustados en "sopa positiva"'],answer:0,explanation:'El modelo moderno utiliza orbitales cuánticos (densidades de probabilidad).'} }
@@ -327,6 +446,29 @@
     let thomsonElectrons = [];
     let thomsonAnimationId = null;
 
+    // Ajustar tamaño del canvas según dispositivo
+    function resizeCanvas() {
+      const container = document.querySelector('.canvas-container');
+      const displayWidth = container.clientWidth;
+      
+      // Mantener la relación de aspecto original (800/420 ≈ 1.9)
+      const displayHeight = Math.min(displayWidth / 1.9, window.innerHeight * 0.5);
+      
+      if (visCanvas.width !== displayWidth || visCanvas.height !== displayHeight) {
+        visCanvas.width = displayWidth;
+        visCanvas.height = displayHeight;
+        
+        // Redibujar el modelo actual si existe
+        if (currentModel) {
+          drawModel(currentModel.id);
+        }
+      }
+    }
+
+    // Inicializar el tamaño del canvas
+    window.addEventListener('load', resizeCanvas);
+    window.addEventListener('resize', resizeCanvas);
+
     // Init UI
     function initModelsList(){
       MODELS.forEach(m=>{
@@ -353,7 +495,11 @@
       modelConcepts.innerHTML = '';
       m.concepts.forEach(c=>{ const li=document.createElement('li'); li.textContent=c; modelConcepts.appendChild(li); });
       renderExercise(m);
+      
+      // Ajustar el canvas antes de dibujar
+      resizeCanvas();
       drawModel(m.id);
+      
       extraControls.innerHTML = '';
       
       // Actualizar estado del botón de animación
@@ -470,7 +616,7 @@
       
       for(let i=0; i<15; i++){
         const ang = Math.random() * Math.PI * 2;
-        const rad = 20 + Math.random() * 120;
+        const rad = 20 + Math.random() * (Math.min(w, h) * 0.3); // Ajustar según tamaño del canvas
         const speed = 0.5 + Math.random() * 1.5;
         
         thomsonElectrons.push({
@@ -620,18 +766,20 @@
       clearCanvas();
       const w=visCanvas.width, h=visCanvas.height;
       ctx.fillStyle='#2b7a78';
-      const r=22; 
+      const r = Math.min(22, w * 0.03); // Radio relativo al tamaño del canvas
       const cols=6, rows=4; 
-      const startX = 80, startY=60;
+      const startX = w * 0.1, startY = h * 0.15;
+      const spacingX = w * 0.12, spacingY = h * 0.15;
+      
       for(let i=0;i<rows;i++){
         for(let j=0;j<cols;j++){
-          const x = startX + j*60 + (i%2?30:0);
-          const y = startY + i*60;
+          const x = startX + j*spacingX + (i%2?spacingX/2:0);
+          const y = startY + i*spacingY;
           ctx.beginPath(); 
           ctx.arc(x,y,r,0,Math.PI*2); 
           ctx.fill();
           ctx.fillStyle='#ffffff'; 
-          ctx.font='14px monospace'; 
+          ctx.font= Math.max(10, r * 0.6) + 'px monospace'; 
           ctx.textAlign='center'; 
           ctx.textBaseline='middle'; 
           ctx.fillText('A', x, y);
@@ -639,9 +787,9 @@
         }
       }
       ctx.fillStyle='#123'; 
-      ctx.font='16px sans-serif'; 
+      ctx.font= Math.max(14, w * 0.018) + 'px sans-serif'; 
       ctx.textAlign='left'; 
-      ctx.fillText('Átomos indivisibles (Dalton)', 10, visCanvas.height-20);
+      ctx.fillText('Átomos indivisibles (Dalton)', w * 0.02, h * 0.9);
     }
 
     // Thomson
@@ -649,11 +797,13 @@
       clearCanvas();
       const w=visCanvas.width, h=visCanvas.height; 
       const centerX = w/2, centerY = h/2;
-      const grad = ctx.createRadialGradient(centerX, centerY, 20, centerX, centerY, 140);
+      const radius = Math.min(140, w * 0.35, h * 0.35); // Radio relativo al tamaño del canvas
+      
+      const grad = ctx.createRadialGradient(centerX, centerY, radius * 0.15, centerX, centerY, radius);
       grad.addColorStop(0, '#ffdede'); 
       grad.addColorStop(1, '#ffe');
       ctx.beginPath(); 
-      ctx.arc(centerX, centerY, 140, 0, Math.PI*2); 
+      ctx.arc(centerX, centerY, radius, 0, Math.PI*2); 
       ctx.fillStyle=grad; 
       ctx.fill(); 
       ctx.strokeStyle='#f0bcbc'; 
@@ -661,22 +811,24 @@
       
       // Dibujar electrones
       ctx.fillStyle='#2b7a78';
+      const electronRadius = Math.max(4, radius * 0.03); // Tamaño relativo de electrones
+      
       thomsonElectrons.forEach(electron => {
         ctx.beginPath(); 
-        ctx.arc(electron.x, electron.y, 8, 0, Math.PI*2); 
+        ctx.arc(electron.x, electron.y, electronRadius, 0, Math.PI*2); 
         ctx.fill();
       });
       
       ctx.fillStyle='#123'; 
-      ctx.font='16px sans-serif'; 
-      ctx.fillText('Electrones incrustados (Thomson)', 10, 30);
+      ctx.font= Math.max(14, w * 0.018) + 'px sans-serif'; 
+      ctx.fillText('Electrones incrustados (Thomson)', w * 0.02, h * 0.05);
     }
 
     // ------- RUTHERFORD (MEJORADA) -------
     function setupRutherford(){
       rutherfordParticles = [];
       const w=visCanvas.width, h=visCanvas.height;
-      const sourceX = 40;
+      const sourceX = w * 0.05;
       const n = 28;
       for(let i=0;i<n;i++){
         const y = h*0.18 + i*(h*0.64)/n;
@@ -696,7 +848,7 @@
     // Step physics: stronger, softened Coulomb-like repulsion and visible trails
     function stepRutherford(){
       const w=visCanvas.width, h=visCanvas.height;
-      const nucleusX = w*0.62, nucleusY = h/2, nucleusR = 18;
+      const nucleusX = w*0.62, nucleusY = h/2, nucleusR = Math.min(18, w * 0.03);
       const K = rutherfordParams.K; // fuerza efectiva ajustable
       for(let p of rutherfordParticles){
         if(!p.active) continue;
@@ -737,22 +889,24 @@
     function drawRutherford(){
       clearCanvas();
       const w=visCanvas.width, h=visCanvas.height;
-      const nucleusX = w*0.62, nucleusY = h/2, nucleusR = 18;
+      const nucleusX = w*0.62, nucleusY = h/2, nucleusR = Math.min(18, w * 0.03);
       // draw nucleus
       ctx.beginPath(); 
       ctx.arc(nucleusX, nucleusY, nucleusR, 0, Math.PI*2); 
       ctx.fillStyle='#d9534f'; 
       ctx.fill();
       ctx.fillStyle='#123'; 
-      ctx.font='14px sans-serif'; 
-      ctx.fillText('Núcleo', nucleusX+26, nucleusY+6);
+      ctx.font= Math.max(10, w * 0.012) + 'px sans-serif'; 
+      ctx.fillText('Núcleo', nucleusX+nucleusR+5, nucleusY+6);
       // draw thin target plane
       ctx.strokeStyle='#ccc'; 
       ctx.beginPath(); 
-      ctx.moveTo(nucleusX-10,nucleusY-160); 
-      ctx.lineTo(nucleusX-10,nucleusY+160); 
+      ctx.moveTo(nucleusX-10,nucleusY-h*0.4); 
+      ctx.lineTo(nucleusX-10,nucleusY+h*0.4); 
       ctx.stroke();
       // draw particles and trails
+      const particleSize = Math.max(2, w * 0.005); // Tamaño relativo de partículas
+      
       for(let p of rutherfordParticles){
         // trail
         if(p.trail && p.trail.length>1){
@@ -763,20 +917,20 @@
           }
           // trail color fades
           ctx.strokeStyle = p.color==='#d9534f' ? 'rgba(217,83,79,0.6)' : 'rgba(43,122,120,0.85)';
-          ctx.lineWidth = 1.6; 
+          ctx.lineWidth = Math.max(1, w * 0.002); 
           ctx.stroke();
         }
         // particle dot
         ctx.beginPath(); 
-        ctx.arc(p.x, p.y, 4.2, 0, Math.PI*2); 
+        ctx.arc(p.x, p.y, particleSize, 0, Math.PI*2); 
         ctx.fillStyle = p.color; 
         ctx.fill();
       }
       ctx.fillStyle='#123'; 
-      ctx.font='14px sans-serif'; 
-      ctx.fillText('Partículas alfa →', 10, 30);
-      ctx.font='12px monospace'; 
-      ctx.fillText('Ajusta Fuerza (K) y Velocidad para ver distintos ángulos de dispersión', 10, 48);
+      ctx.font= Math.max(14, w * 0.018) + 'px sans-serif'; 
+      ctx.fillText('Partículas alfa →', w * 0.02, h * 0.05);
+      ctx.font= Math.max(10, w * 0.012) + 'px monospace'; 
+      ctx.fillText('Ajusta Fuerza (K) y Velocidad para ver distintos ángulos de dispersión', w * 0.02, h * 0.09);
     }
 
     // Animation loop for Rutherford (using requestAnimationFrame, start/stop safe)
@@ -800,48 +954,51 @@
       const w=visCanvas.width, h=visCanvas.height, cx=w/2, cy=h/2;
 
       // Núcleo
+      const nucleusSize = Math.min(12, w * 0.02);
       ctx.beginPath(); 
-      ctx.arc(cx,cy,12,0,Math.PI*2); 
+      ctx.arc(cx,cy,nucleusSize,0,Math.PI*2); 
       ctx.fillStyle='#d9534f'; 
       ctx.fill();
 
       // Órbitas
+      const orbitBase = Math.min(30, w * 0.05);
       for(let n=1;n<=5;n++){
         ctx.beginPath(); 
-        ctx.arc(cx,cy,30*n,0,Math.PI*2);
+        ctx.arc(cx,cy,orbitBase*n,0,Math.PI*2);
         ctx.strokeStyle = '#e0f5f5'; 
-        ctx.lineWidth=2; 
+        ctx.lineWidth= Math.max(1, w * 0.002); 
         ctx.stroke();
         ctx.fillStyle='#123'; 
-        ctx.font='12px sans-serif'; 
-        ctx.fillText('n='+n, cx+30*n+8, cy-4);
+        ctx.font= Math.max(10, w * 0.012) + 'px sans-serif'; 
+        ctx.fillText('n='+n, cx+orbitBase*n+8, cy-4);
       }
 
       // Electrón en la órbita actual
       const theta = -0.6;
-      const r = 30*state.n;
+      const r = orbitBase*state.n;
+      const electronSize = Math.max(4, w * 0.008);
       ctx.beginPath(); 
-      ctx.arc(cx+r*Math.cos(theta), cy+r*Math.sin(theta),6,0,Math.PI*2);
+      ctx.arc(cx+r*Math.cos(theta), cy+r*Math.sin(theta),electronSize,0,Math.PI*2);
       ctx.fillStyle='#2b7a78'; 
       ctx.fill();
 
       // Transición (salto entre niveles)
       if(state.showTransition){
-        const r1 = 30*state.n;
-        const r2 = 30*state.to;
+        const r1 = orbitBase*state.n;
+        const r2 = orbitBase*state.to;
         const x1 = cx + r1*Math.cos(theta), y1 = cy + r1*Math.sin(theta);
         const x2 = cx + r2*Math.cos(theta), y2 = cy + r2*Math.sin(theta);
         ctx.beginPath(); 
         ctx.moveTo(x1,y1); 
         ctx.lineTo(x2,y2); 
         ctx.strokeStyle='#ff8a00'; 
-        ctx.lineWidth=3; 
+        ctx.lineWidth= Math.max(2, w * 0.003); 
         ctx.stroke();
       }
 
       ctx.fillStyle='#123'; 
-      ctx.font='16px sans-serif'; 
-      ctx.fillText('Órbitas cuantizadas (Bohr)', 10, 30);
+      ctx.font= Math.max(14, w * 0.018) + 'px sans-serif'; 
+      ctx.fillText('Órbitas cuantizadas (Bohr)', w * 0.02, h * 0.05);
     }
 
     function drawSchrodinger(mode='1s'){
@@ -849,43 +1006,47 @@
       const w=visCanvas.width, h=visCanvas.height, cx = w/2, cy = h/2;
 
       // núcleo
+      const nucleusSize = Math.min(8, w * 0.015);
       ctx.beginPath(); 
-      ctx.arc(cx,cy,8,0,Math.PI*2); 
+      ctx.arc(cx,cy,nucleusSize,0,Math.PI*2); 
       ctx.fillStyle='#d9534f'; 
       ctx.fill();
 
       if(mode==='1s'){ // Esfera
-        for(let r=10;r<140;r+=6){
+        const maxRadius = Math.min(140, w * 0.3);
+        for(let r=10;r<maxRadius;r+=6){
           ctx.beginPath(); 
           ctx.arc(cx,cy,r,0,Math.PI*2);
           ctx.fillStyle = `rgba(43,122,120,${0.12*Math.exp(-r/40)})`; 
           ctx.fill();
         }
         ctx.fillStyle='#123'; 
-        ctx.font='16px sans-serif'; 
-        ctx.fillText('Orbital 1s', 10, 30);
+        ctx.font= Math.max(14, w * 0.018) + 'px sans-serif'; 
+        ctx.fillText('Orbital 1s', w * 0.02, h * 0.05);
 
       } else if(mode==='2p'){ // Dos lóbulos
-        for(let i=0;i<80;i+=4){
+        const maxSize = Math.min(80, w * 0.2);
+        for(let i=0;i<maxSize;i+=4){
           ctx.beginPath();
-          ctx.ellipse(cx+40, cy, i/2+6, i/4+6, 0, 0, Math.PI*2);
+          ctx.ellipse(cx+maxSize*0.3, cy, i/2+6, i/4+6, 0, 0, Math.PI*2);
           ctx.fillStyle = `rgba(43,122,120,${0.04*Math.exp(-i/40)})`; 
           ctx.fill();
 
           ctx.beginPath();
-          ctx.ellipse(cx-40, cy, i/2+6, i/4+6, 0, 0, Math.PI*2);
+          ctx.ellipse(cx-maxSize*0.3, cy, i/2+6, i/4+6, 0, 0, Math.PI*2);
           ctx.fillStyle = `rgba(43,122,120,${0.04*Math.exp(-i/40)})`; 
           ctx.fill();
         }
         ctx.fillStyle='#123'; 
-        ctx.font='16px sans-serif'; 
-        ctx.fillText('Orbital 2p', 10, 30);
+        ctx.font= Math.max(14, w * 0.018) + 'px sans-serif'; 
+        ctx.fillText('Orbital 2p', w * 0.02, h * 0.05);
 
       } else if(mode==='3d'){ // Cuatro lóbulos tipo trébol
-        for(let i=0;i<60;i+=3){
+        const maxSize = Math.min(60, w * 0.15);
+        for(let i=0;i<maxSize;i+=3){
           for(let ang=0; ang<Math.PI*2; ang+=Math.PI/2){
-            const x = cx + Math.cos(ang)*50;
-            const y = cy + Math.sin(ang)*50;
+            const x = cx + Math.cos(ang)*maxSize*0.6;
+            const y = cy + Math.sin(ang)*maxSize*0.6;
             ctx.beginPath();
             ctx.ellipse(x, y, i/2+6, i/4+6, ang, 0, Math.PI*2);
             ctx.fillStyle = `rgba(43,122,120,${0.05*Math.exp(-i/35)})`;
@@ -893,14 +1054,15 @@
           }
         }
         ctx.fillStyle='#123'; 
-        ctx.font='16px sans-serif'; 
-        ctx.fillText('Orbital 3d (trébol)', 10, 30);
+        ctx.font= Math.max(14, w * 0.018) + 'px sans-serif'; 
+        ctx.fillText('Orbital 3d (trébol)', w * 0.02, h * 0.05);
 
       } else if(mode==='4f'){ // varios lóbulos (representación artística)
-        for(let i=0;i<50;i+=3){
+        const maxSize = Math.min(50, w * 0.12);
+        for(let i=0;i<maxSize;i+=3){
           for(let ang=0; ang<Math.PI*2; ang+=Math.PI/3){
-            const x = cx + Math.cos(ang)*70;
-            const y = cy + Math.sin(ang)*70;
+            const x = cx + Math.cos(ang)*maxSize*0.8;
+            const y = cy + Math.sin(ang)*maxSize*0.8;
             ctx.beginPath();
             ctx.ellipse(x, y, i/2+5, i/4+5, ang/2, 0, Math.PI*2);
             ctx.fillStyle = `rgba(43,122,120,${0.04*Math.exp(-i/30)})`;
@@ -908,8 +1070,8 @@
           }
         }
         ctx.fillStyle='#123'; 
-        ctx.font='16px sans-serif'; 
-        ctx.fillText('Orbital 4f (esquemático)', 10, 30);
+        ctx.font= Math.max(14, w * 0.018) + 'px sans-serif'; 
+        ctx.fillText('Orbital 4f (esquemático)', w * 0.02, h * 0.05);
       }
     }
 
@@ -918,14 +1080,16 @@
       const w = visCanvas.width, h = visCanvas.height, cx = w/2, cy = h/2;
 
       // Núcleo
+      const nucleusSize = Math.min(15, w * 0.025);
       ctx.beginPath();
-      ctx.arc(cx, cy, 15, 0, Math.PI*2);
+      ctx.arc(cx, cy, nucleusSize, 0, Math.PI*2);
       ctx.fillStyle = '#d9534f';
       ctx.fill();
 
       // Nube electrónica (muchos puntitos semitransparentes)
+      const cloudRadius = Math.min(150, w * 0.35);
       for(let i=0; i<600; i++){
-        let r = 150 * Math.sqrt(Math.random()); // distribución radial más realista
+        let r = cloudRadius * Math.sqrt(Math.random()); // distribución radial más realista
         let theta = Math.random() * 2 * Math.PI;
         let x = cx + r * Math.cos(theta);
         let y = cy + r * Math.sin(theta);
@@ -935,8 +1099,8 @@
       }
 
       ctx.fillStyle = '#123';
-      ctx.font = '16px sans-serif';
-      ctx.fillText('Modelo actual: nube electrónica', 10, 30);
+      ctx.font = Math.max(14, w * 0.018) + 'px sans-serif';
+      ctx.fillText('Modelo actual: nube electrónica', w * 0.02, h * 0.05);
     }
 
     function drawModel(id){
