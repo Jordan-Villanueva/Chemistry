@@ -176,15 +176,40 @@
       border: none;
     }
 
-    /* ===============================
-       MODO MÓVIL
-    =============================== */
-    @media (max-width: 900px){ 
-      .layout { grid-template-columns: 1fr; }
-      .header { text-align: center; justify-content: center; }
-      .controls { justify-content: center; }
-      .panel { padding: 16px; }
-    }
+	    /* ===============================
+	   MODO MÓVIL MEJORADO
+	=============================== */
+	@media (max-width: 900px){ 
+	  .layout { grid-template-columns: 1fr; }
+	  .header { text-align: center; justify-content: center; }
+	  .controls { justify-content: center; flex-wrap: wrap; }
+	  .panel { padding: 16px; }
+
+	  /* Lista de modelos ocupa todo el ancho */
+	  .models-list { width: 100%; }
+
+	  /* Botones más grandes y cómodos */
+	  .model-btn, .btn, .mutebtn {
+	    font-size: 1.1rem;
+	    padding: 14px;
+	  }
+
+	  /* Canvas se ajusta al ancho del panel */
+	  canvas {
+	    width: 100% !important;
+	    height: auto;
+	  }
+
+	  /* Videos responsivos (ya lo tienes, solo reforzar) */
+	  .video-container iframe {
+	    width: 100%;
+	    height: auto;
+	  }
+
+	  /* Ejercicios: las opciones ocupan todo el ancho */
+	  .choices .choice { width: 100%; font-size: 1rem; padding: 12px; }
+	}
+
   </style>
 </head>
 
