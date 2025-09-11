@@ -296,10 +296,12 @@ if(m.id === 'thomson'){
   videoDiv.innerHTML = `
     <strong>Demostración de rayos catódicos</strong>
     <p class="small">Observa cómo las partículas (electrones) se mueven dentro del tubo de Crookes vacío.</p>
-    <video width="100%" height="180" controls>
-      <source src="./videos/clip2.mp4.mkv" type="video/mp4">
-      Tu navegador no soporta la reproducción de video.
-    </video>
+    <div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden;">
+      <iframe src="https://www.youtube.com/embed/nynb_kjXYWU" 
+              style="position:absolute; top:0; left:0; width:100%; height:100%;" 
+              frameborder="0" allowfullscreen>
+      </iframe>
+    </div>
   `;
   extraControls.appendChild(videoDiv);
 }
@@ -322,10 +324,12 @@ if(m.id === 'rutherford'){
     <div class="small" style="margin-top:8px">Pulsa <strong>Iniciar animación</strong> para lanzar partículas alfa contra el núcleo. Observa cómo las que pasan cerca se desvían fuertemente.</div>
     <div style="margin-top:12px">
       <strong>Video del experimento de Rutherford</strong>
-      <video width="100%" height="200" controls>
-        <source src="./videos/clip1.mp4.mkv" type="video/mp4">
-        Tu navegador no soporta la reproducción de video.
-      </video>
+      <div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden;">
+        <iframe src="https://www.youtube.com/embed/SQqCCrv_Cws" 
+                style="position:absolute; top:0; left:0; width:100%; height:100%;" 
+                frameborder="0" allowfullscreen>
+        </iframe>
+      </div>
     </div>
     <div class="small" style="margin-top:10px">
       Nota: Rutherford utilizó partículas alfa, emitidas por materiales radiactivos, para estudiar la dispersión en la lámina de oro. Esto permitió deducir la existencia del núcleo y el predominio de espacio vacío en el átomo.
@@ -343,7 +347,6 @@ if(m.id === 'rutherford'){
 }
 
 
-
 if(m.id === 'bohr'){
   const bohrDiv = document.createElement('div');
   bohrDiv.style.marginTop = '12px';
@@ -353,22 +356,27 @@ if(m.id === 'bohr'){
 
     <div style="margin-top:8px">
       <strong>Video 1: Transiciones electrónicas</strong>
-      <video width="100%" height="180" controls>
-        <source src="./videos/clip3.mp4.webm" type="video/mp4">
-        Tu navegador no soporta la reproducción de video.
-      </video>
+      <div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden;">
+        <iframe src="https://www.youtube.com/embed/7u3rRy97m9Y" 
+                style="position:absolute; top:0; left:0; width:100%; height:100%;" 
+                frameborder="0" allowfullscreen>
+        </iframe>
+      </div>
     </div>
 
     <div style="margin-top:12px">
       <strong>Video 2: Espectros de emisión</strong>
-      <video width="100%" height="180" controls>
-        <source src="./videos/clip4.mp4.webm" type="video/mp4">
-        Tu navegador no soporta la reproducción de video.
-      </video>
+      <div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden;">
+        <iframe src="https://www.youtube.com/embed/m69GjvN3n0M" 
+                style="position:absolute; top:0; left:0; width:100%; height:100%;" 
+                frameborder="0" allowfullscreen>
+        </iframe>
+      </div>
     </div>
   `;
   extraControls.appendChild(bohrDiv);
 }
+
  
 }
 
