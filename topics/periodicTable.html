@@ -5,111 +5,454 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Configuraciones Electrónicas y Números Cuánticos</title>
 <style>
+  :root {
+    --primary: #1a237e;
+    --primary-light: #534bae;
+    --primary-dark: #000051;
+    --secondary: #f50057;
+    --secondary-light: #ff5983;
+    --secondary-dark: #bb002f;
+    --background: #f7f9fc;
+    --surface: #ffffff;
+    --text-primary: #1a237e;
+    --text-secondary: #5c6bc0;
+    --success: #43a047;
+    --warning: #ffa000;
+    --error: #d32f2f;
+  }
+  
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
   body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    background: #f7f9fc;
-    color: #1a237e;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: var(--background);
+    color: var(--text-primary);
+    line-height: 1.6;
   }
-  h1, h2 { text-align: center; }
-  .panel { 
-    background: #fff; 
-    padding: 20px; 
-    border-radius: 10px; 
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  header {
+    text-align: center;
     margin-bottom: 30px;
+    padding: 20px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   }
-  select { padding: 5px 10px; font-size: 1rem; margin-bottom: 10px; }
-  .output { 
-    margin-top: 20px; 
-    padding: 10px; 
-    background: #e8eaf6; 
-    border-radius: 5px; 
-    white-space: pre-wrap; 
-    font-family: monospace;
+  
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
   }
+  
+  h2 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: var(--primary);
+  }
+  
+  .subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+  }
+  
+  .panel {
+    background: var(--surface);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
+    transition: transform 0.3s ease;
+  }
+  
+  .panel:hover {
+    transform: translateY(-5px);
+  }
+  
+  .flex-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .element-info {
+    flex: 1;
+    min-width: 300px;
+  }
+  
+  .orbital-info {
+    flex: 2;
+    min-width: 300px;
+  }
+  
+  select, input {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    color: var(--text-primary);
+    transition: border-color 0.3s;
+  }
+  
+  select:focus, input:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.2);
+  }
+  
+  .output {
+    margin-top: 20px;
+    padding: 20px;
+    background: #e8eaf6;
+    border-radius: 8px;
+    white-space: pre-wrap;
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    border-left: 5px solid var(--primary);
+  }
+  
   .orbital-diagram {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 15px;
     justify-content: center;
-    margin-top: 15px;
-  }
-  .orbital {
-    width: 60px;
-    text-align: center;
-    padding: 10px;
-    border-radius: 5px;
-    background: #c5cae9; /* color base */
-    color: #1a237e;
-    user-select: none;
-    position: relative;
-  }
-  .orbital span { display: block; font-size: 0.8rem; }
-  .orbital .fill {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: #3f51b5;
-    border-radius: 0 0 5px 5px;
-    color: white;
-    text-align: center;
-    font-size: 0.8rem;
+    margin-top: 20px;
   }
   
   .orbital {
-    width: 60px;
+    width: 100px;
     text-align: center;
-    padding: 10px;
-    border-radius: 5px;
+    padding: 15px 10px;
+    border-radius: 8px;
     background: #c5cae9;
-    color: #1a237e;
+    color: var(--text-primary);
     user-select: none;
     position: relative;
-    font-weight: bold;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
   }
-  .orbital span { display: block; font-size: 0.8rem; }
-  .orbital .fill {
-    position: absolute;
-    bottom: 0;
-    left: 0;
+  
+  .orbital:hover {
+    transform: scale(1.05);
+  }
+  
+  .orbital-label {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+  }
+  
+  .quantum-numbers {
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+    color: var(--text-secondary);
+  }
+  
+  .orbital-bar {
     width: 100%;
-    background: #3f51b5;
-    border-radius: 0 0 5px 5px;
-    color: white;
-    text-align: center;
-    font-size: 0.8rem;
+    height: 40px;
+    background: #e8eaf6;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+  
+  .orbital-fill {
+    height: 100%;
+    background: linear-gradient(to top, var(--primary), var(--primary-light));
+    border-radius: 8px;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    transition: width 1s ease;
+  }
+  
+  .element-details {
+    margin-top: 25px;
+    padding: 20px;
+    background: #e3f2fd;
+    border-radius: 8px;
+    border-left: 5px solid var(--secondary);
+  }
+  
+  .element-properties {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+  }
+  
+  .property {
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 6px;
+    text-align: center;
+  }
+  
+  .property-name {
+    font-weight: bold;
+    color: var(--primary);
+  }
+  
+  .property-value {
+    font-size: 1.1rem;
+    margin-top: 5px;
+  }
+  
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 20px;
+    justify-content: center;
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+  }
+  
+  @media (max-width: 768px) {
+    .flex-container {
+      flex-direction: column;
+    }
+    
+    .orbital {
+      width: 85px;
+    }
+    
+    h1 {
+      font-size: 2rem;
+    }
+    
+    h2 {
+      font-size: 1.5rem;
+    }
+  }
+  
+  .search-container {
+    position: relative;
+  }
+  
+  .search-icon {
+    position: absolute;
+    right: 15px;
+    top: 13px;
+    color: var(--text-secondary);
+  }
+  
+  .highlight {
+    background: linear-gradient(120deg, #ffeb3b 0%, #ffeb3b 100%);
+    background-repeat: no-repeat;
+    background-size: 100% 40%;
+    background-position: 0 90%;
   }
 </style>
 </head>
 <body>
 
-<h1>Configuraciones Electrónicas y Números Cuánticos</h1>
+<div class="container">
+  <header>
+    <h1>Configuraciones Electrónicas y Números Cuánticos</h1>
+    <p class="subtitle">Explora más de 70 elementos de la tabla periódica</p>
+  </header>
 
-<div class="panel">
-  <h2>Selecciona un elemento</h2>
-  <select id="elementSelect">
-    <option value="">--Elige un elemento--</option>
-  </select>
-  <div class="output" id="configurationOutput">
-    Aquí aparecerá la configuración electrónica.
+  <div class="flex-container">
+    <div class="panel element-info">
+      <h2>Selecciona un elemento</h2>
+      
+      <div class="search-container">
+        <select id="elementSelect">
+          <option value="">--Elige un elemento--</option>
+        </select>
+        <div class="search-icon">🔍</div>
+      </div>
+      
+      <input type="range" id="atomicNumberSlider" min="1" max="118" value="1" step="1">
+      <div style="text-align: center; margin-bottom: 15px;">
+        <span id="atomicNumberDisplay">Número atómico: 1</span>
+      </div>
+      
+      <div class="output" id="configurationOutput">
+        Aquí aparecerá la configuración electrónica.
+      </div>
+      
+      <div class="element-details" id="elementDetails">
+        <h3>Información del Elemento</h3>
+        <div class="element-properties" id="elementProperties">
+          <!-- La información del elemento se insertará aquí -->
+        </div>
+      </div>
+    </div>
+    
+    <div class="panel orbital-info">
+      <h2>Diagrama de Orbitales</h2>
+      <div class="orbital-diagram" id="orbitalDiagram"></div>
+      
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-color" style="background: #c5cae9;"></div>
+          <span>Orbital vacío</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: linear-gradient(to top, #1a237e, #534bae);"></div>
+          <span>Orbital parcialmente lleno</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #1a237e;"></div>
+          <span>Orbital completo</span>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
-<div class="panel">
-  <h2>Diagrama de Orbitales</h2>
-  <div class="orbital-diagram" id="orbitalDiagram"></div>
-</div>
-
 <script>
+// Base de datos ampliada de elementos
 const elements = {
-  "H": 1, "He": 2, "Li": 3, "Be": 4, "B": 5, "C": 6, "N": 7, "O": 8,
-  "F": 9, "Ne": 10, "Na": 11, "Mg": 12, "Al": 13, "Si": 14, "P": 15,
-  "S": 16, "Cl": 17, "Ar": 18
+  "H": {Z:1, name:"Hidrógeno", mass:1.008, category:"No metal", config:"1s¹"},
+  "He": {Z:2, name:"Helio", mass:4.003, category:"Gas noble", config:"1s²"},
+  "Li": {Z:3, name:"Litio", mass:6.94, category:"Metal alcalino", config:"1s² 2s¹"},
+  "Be": {Z:4, name:"Berilio", mass:9.012, category:"Metal alcalinotérreo", config:"1s² 2s²"},
+  "B": {Z:5, name:"Boro", mass:10.81, category:"Metaloide", config:"1s² 2s² 2p¹"},
+  "C": {Z:6, name:"Carbono", mass:12.01, category:"No metal", config:"1s² 2s² 2p²"},
+  "N": {Z:7, name:"Nitrógeno", mass:14.01, category:"No metal", config:"1s² 2s² 2p³"},
+  "O": {Z:8, name:"Oxígeno", mass:16.00, category:"No metal", config:"1s² 2s² 2p⁴"},
+  "F": {Z:9, name:"Flúor", mass:19.00, category:"Halógeno", config:"1s² 2s² 2p⁵"},
+  "Ne": {Z:10, name:"Neón", mass:20.18, category:"Gas noble", config:"1s² 2s² 2p⁶"},
+  "Na": {Z:11, name:"Sodio", mass:22.99, category:"Metal alcalino", config:"[Ne] 3s¹"},
+  "Mg": {Z:12, name:"Magnesio", mass:24.31, category:"Metal alcalinotérreo", config:"[Ne] 3s²"},
+  "Al": {Z:13, name:"Aluminio", mass:26.98, category:"Metal", config:"[Ne] 3s² 3p¹"},
+  "Si": {Z:14, name:"Silicio", mass:28.09, category:"Metaloide", config:"[Ne] 3s² 3p²"},
+  "P": {Z:15, name:"Fósforo", mass:30.97, category:"No metal", config:"[Ne] 3s² 3p³"},
+  "S": {Z:16, name:"Azufre", mass:32.07, category:"No metal", config:"[Ne] 3s² 3p⁴"},
+  "Cl": {Z:17, name:"Cloro", mass:35.45, category:"Halógeno", config:"[Ne] 3s² 3p⁵"},
+  "Ar": {Z:18, name:"Argón", mass:39.95, category:"Gas noble", config:"[Ne] 3s² 3p⁶"},
+  "K": {Z:19, name:"Potasio", mass:39.10, category:"Metal alcalino", config:"[Ar] 4s¹"},
+  "Ca": {Z:20, name:"Calcio", mass:40.08, category:"Metal alcalinotérreo", config:"[Ar] 4s²"},
+  "Sc": {Z:21, name:"Escandio", mass:44.96, category:"Metal de transición", config:"[Ar] 3d¹ 4s²"},
+  "Ti": {Z:22, name:"Titanio", mass:47.87, category:"Metal de transición", config:"[Ar] 3d² 4s²"},
+  "V": {Z:23, name:"Vanadio", mass:50.94, category:"Metal de transición", config:"[Ar] 3d³ 4s²"},
+  "Cr": {Z:24, name:"Cromo", mass:52.00, category:"Metal de transición", config:"[Ar] 3d⁵ 4s¹"},
+  "Mn": {Z:25, name:"Manganeso", mass:54.94, category:"Metal de transición", config:"[Ar] 3d⁵ 4s²"},
+  "Fe": {Z:26, name:"Hierro", mass:55.85, category:"Metal de transición", config:"[Ar] 3d⁶ 4s²"},
+  "Co": {Z:27, name:"Cobalto", mass:58.93, category:"Metal de transición", config:"[Ar] 3d⁷ 4s²"},
+  "Ni": {Z:28, name:"Níquel", mass:58.69, category:"Metal de transición", config:"[Ar] 3d⁸ 4s²"},
+  "Cu": {Z:29, name:"Cobre", mass:63.55, category:"Metal de transición", config:"[Ar] 3d¹⁰ 4s¹"},
+  "Zn": {Z:30, name:"Zinc", mass:65.38, category:"Metal de transición", config:"[Ar] 3d¹⁰ 4s²"},
+  "Ga": {Z:31, name:"Galio", mass:69.72, category:"Metal", config:"[Ar] 3d¹⁰ 4s² 4p¹"},
+  "Ge": {Z:32, name:"Germanio", mass:72.63, category:"Metaloide", config:"[Ar] 3d¹⁰ 4s² 4p²"},
+  "As": {Z:33, name:"Arsénico", mass:74.92, category:"Metaloide", config:"[Ar] 3d¹⁰ 4s² 4p³"},
+  "Se": {Z:34, name:"Selenio", mass:78.97, category:"No metal", config:"[Ar] 3d¹⁰ 4s² 4p⁴"},
+  "Br": {Z:35, name:"Bromo", mass:79.90, category:"Halógeno", config:"[Ar] 3d¹⁰ 4s² 4p⁵"},
+  "Kr": {Z:36, name:"Kriptón", mass:83.80, category:"Gas noble", config:"[Ar] 3d¹⁰ 4s² 4p⁶"},
+  "Rb": {Z:37, name:"Rubidio", mass:85.47, category:"Metal alcalino", config:"[Kr] 5s¹"},
+  "Sr": {Z:38, name:"Estroncio", mass:87.62, category:"Metal alcalinotérreo", config:"[Kr] 5s²"},
+  "Y": {Z:39, name:"Itrio", mass:88.91, category:"Metal de transición", config:"[Kr] 4d¹ 5s²"},
+  "Zr": {Z:40, name:"Circonio", mass:91.22, category:"Metal de transición", config:"[Kr] 4d² 5s²"},
+  "Nb": {Z:41, name:"Niobio", mass:92.91, category:"Metal de transición", config:"[Kr] 4d⁴ 5s¹"},
+  "Mo": {Z:42, name:"Molibdeno", mass:95.95, category:"Metal de transición", config:"[Kr] 4d⁵ 5s¹"},
+  "Tc": {Z:43, name:"Tecnecio", mass:98.00, category:"Metal de transición", config:"[Kr] 4d⁵ 5s²"},
+  "Ru": {Z:44, name:"Rutenio", mass:101.1, category:"Metal de transición", config:"[Kr] 4d⁷ 5s¹"},
+  "Rh": {Z:45, name:"Rodio", mass:102.9, category:"Metal de transición", config:"[Kr] 4d⁸ 5s¹"},
+  "Pd": {Z:46, name:"Paladio", mass:106.4, category:"Metal de transición", config:"[Kr] 4d¹⁰"},
+  "Ag": {Z:47, name:"Plata", mass:107.9, category:"Metal de transición", config:"[Kr] 4d¹⁰ 5s¹"},
+  "Cd": {Z:48, name:"Cadmio", mass:112.4, category:"Metal de transición", config:"[Kr] 4d¹⁰ 5s²"},
+  "In": {Z:49, name:"Indio", mass:114.8, category:"Metal", config:"[Kr] 4d¹⁰ 5s² 5p¹"},
+  "Sn": {Z:50, name:"Estaño", mass:118.7, category:"Metal", config:"[Kr] 4d¹⁰ 5s² 5p²"},
+  "Sb": {Z:51, name:"Antimonio", mass:121.8, category:"Metaloide", config:"[Kr] 4d¹⁰ 5s² 5p³"},
+  "Te": {Z:52, name:"Telurio", mass:127.6, category:"Metaloide", config:"[Kr] 4d¹⁰ 5s² 5p⁴"},
+  "I": {Z:53, name:"Yodo", mass:126.9, category:"Halógeno", config:"[Kr] 4d¹⁰ 5s² 5p⁵"},
+  "Xe": {Z:54, name:"Xenón", mass:131.3, category:"Gas noble", config:"[Kr] 4d¹⁰ 5s² 5p⁶"},
+  "Cs": {Z:55, name:"Cesio", mass:132.9, category:"Metal alcalino", config:"[Xe] 6s¹"},
+  "Ba": {Z:56, name:"Bario", mass:137.3, category:"Metal alcalinotérreo", config:"[Xe] 6s²"},
+  "La": {Z:57, name:"Lantano", mass:138.9, category:"Lantánido", config:"[Xe] 5d¹ 6s²"},
+  "Ce": {Z:58, name:"Cerio", mass:140.1, category:"Lantánido", config:"[Xe] 4f¹ 5d¹ 6s²"},
+  "Pr": {Z:59, name:"Praseodimio", mass:140.9, category:"Lantánido", config:"[Xe] 4f³ 6s²"},
+  "Nd": {Z:60, name:"Neodimio", mass:144.2, category:"Lantánido", config:"[Xe] 4f⁴ 6s²"},
+  "Pm": {Z:61, name:"Promecio", mass:145.0, category:"Lantánido", config:"[Xe] 4f⁵ 6s²"},
+  "Sm": {Z:62, name:"Samario", mass:150.4, category:"Lantánido", config:"[Xe] 4f⁶ 6s²"},
+  "Eu": {Z:63, name:"Europio", mass:152.0, category:"Lantánido", config:"[Xe] 4f⁷ 6s²"},
+  "Gd": {Z:64, name:"Gadolinio", mass:157.3, category:"Lantánido", config:"[Xe] 4f⁷ 5d¹ 6s²"},
+  "Tb": {Z:65, name:"Terbio", mass:158.9, category:"Lantánido", config:"[Xe] 4f⁹ 6s²"},
+  "Dy": {Z:66, name:"Disprosio", mass:162.5, category:"Lantánido", config:"[Xe] 4f¹⁰ 6s²"},
+  "Ho": {Z:67, name:"Holmio", mass:164.9, category:"Lantánido", config:"[Xe] 4f¹¹ 6s²"},
+  "Er": {Z:68, name:"Erbio", mass:167.3, category:"Lantánido", config:"[Xe] 4f¹² 6s²"},
+  "Tm": {Z:69, name:"Tulio", mass:168.9, category:"Lantánido", config:"[Xe] 4f¹³ 6s²"},
+  "Yb": {Z:70, name:"Iterbio", mass:173.1, category:"Lantánido", config:"[Xe] 4f¹⁴ 6s²"},
+  "Lu": {Z:71, name:"Lutecio", mass:175.0, category:"Lantánido", config:"[Xe] 4f¹⁴ 5d¹ 6s²"},
+  "Hf": {Z:72, name:"Hafnio", mass:178.5, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d² 6s²"},
+  "Ta": {Z:73, name:"Tantalio", mass:180.9, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d³ 6s²"},
+  "W": {Z:74, name:"Wolframio", mass:183.8, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d⁴ 6s²"},
+  "Re": {Z:75, name:"Renio", mass:186.2, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d⁵ 6s²"},
+  "Os": {Z:76, name:"Osmio", mass:190.2, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d⁶ 6s²"},
+  "Ir": {Z:77, name:"Iridio", mass:192.2, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d⁷ 6s²"},
+  "Pt": {Z:78, name:"Platino", mass:195.1, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d⁹ 6s¹"},
+  "Au": {Z:79, name:"Oro", mass:197.0, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s¹"},
+  "Hg": {Z:80, name:"Mercurio", mass:200.6, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s²"},
+  "Tl": {Z:81, name:"Talio", mass:204.4, category:"Metal", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p¹"},
+  "Pb": {Z:82, name:"Plomo", mass:207.2, category:"Metal", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p²"},
+  "Bi": {Z:83, name:"Bismuto", mass:209.0, category:"Metal", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p³"},
+  "Po": {Z:84, name:"Polonio", mass:209.0, category:"Metaloide", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁴"},
+  "At": {Z:85, name:"Astato", mass:210.0, category:"Halógeno", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁵"},
+  "Rn": {Z:86, name:"Radón", mass:222.0, category:"Gas noble", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁶"},
+  "Fr": {Z:87, name:"Francio", mass:223.0, category:"Metal alcalino", config:"[Rn] 7s¹"},
+  "Ra": {Z:88, name:"Radio", mass:226.0, category:"Metal alcalinotérreo", config:"[Rn] 7s²"},
+  "Ac": {Z:89, name:"Actinio", mass:227.0, category:"Actínido", config:"[Rn] 6d¹ 7s²"},
+  "Th": {Z:90, name:"Torio", mass:232.0, category:"Actínido", config:"[Rn] 6d² 7s²"},
+  "Pa": {Z:91, name:"Protactinio", mass:231.0, category:"Actínido", config:"[Rn] 5f² 6d¹ 7s²"},
+  "U": {Z:92, name:"Uranio", mass:238.0, category:"Actínido", config:"[Rn] 5f³ 6d¹ 7s²"},
+  "Np": {Z:93, name:"Neptunio", mass:237.0, category:"Actínido", config:"[Rn] 5f⁴ 6d¹ 7s²"},
+  "Pu": {Z:94, name:"Plutonio", mass:244.0, category:"Actínido", config:"[Rn] 5f⁶ 7s²"},
+  "Am": {Z:95, name:"Americio", mass:243.0, category:"Actínido", config:"[Rn] 5f⁷ 7s²"},
+  "Cm": {Z:96, name:"Curio", mass:247.0, category:"Actínido", config:"[Rn] 5f⁷ 6d¹ 7s²"},
+  "Bk": {Z:97, name:"Berkelio", mass:247.0, category:"Actínido", config:"[Rn] 5f⁹ 7s²"},
+  "Cf": {Z:98, name:"Californio", mass:251.0, category:"Actínido", config:"[Rn] 5f¹⁰ 7s²"},
+  "Es": {Z:99, name:"Einstenio", mass:252.0, category:"Actínido", config:"[Rn] 5f¹¹ 7s²"},
+  "Fm": {Z:100, name:"Fermio", mass:257.0, category:"Actínido", config:"[Rn] 5f¹² 7s²"},
+  "Md": {Z:101, name:"Mendelevio", mass:258.0, category:"Actínido", config:"[Rn] 5f¹³ 7s²"},
+  "No": {Z:102, name:"Nobelio", mass:259.0, category:"Actínido", config:"[Rn] 5f¹⁴ 7s²"},
+  "Lr": {Z:103, name:"Laurencio", mass:262.0, category:"Actínido", config:"[Rn] 5f¹⁴ 7s² 7p¹"},
+  "Rf": {Z:104, name:"Rutherfordio", mass:267.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d² 7s²"},
+  "Db": {Z:105, name:"Dubnio", mass:268.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d³ 7s²"},
+  "Sg": {Z:106, name:"Seaborgio", mass:269.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d⁴ 7s²"},
+  "Bh": {Z:107, name:"Bohrio", mass:270.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d⁵ 7s²"},
+  "Hs": {Z:108, name:"Hassio", mass:277.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d⁶ 7s²"},
+  "Mt": {Z:109, name:"Meitnerio", mass:278.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d⁷ 7s²"},
+  "Ds": {Z:110, name:"Darmstatio", mass:281.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d⁹ 7s¹"},
+  "Rg": {Z:111, name:"Roentgenio", mass:282.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s¹"},
+  "Cn": {Z:112, name:"Copernicio", mass:285.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s²"},
+  "Nh": {Z:113, name:"Nihonio", mass:286.0, category:"Metal", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p¹"},
+  "Fl": {Z:114, name:"Flerovio", mass:289.0, category:"Metal", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p²"},
+  "Mc": {Z:115, name:"Moscovio", mass:290.0, category:"Metal", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p³"},
+  "Lv": {Z:116, name:"Livermorio", mass:293.0, category:"Metal", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁴"},
+  "Ts": {Z:117, name:"Teneso", mass:294.0, category:"Halógeno", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁵"},
+  "Og": {Z:118, name:"Oganesón", mass:294.0, category:"Gas noble", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶"}
 };
 
 const aufbauOrder = [
@@ -118,23 +461,28 @@ const aufbauOrder = [
   {orbital: "3d", n:3, l:2}, {orbital: "4p", n:4, l:1}, {orbital: "5s", n:5, l:0},
   {orbital: "4d", n:4, l:2}, {orbital: "5p", n:5, l:1}, {orbital: "6s", n:6, l:0},
   {orbital: "4f", n:4, l:3}, {orbital: "5d", n:5, l:2}, {orbital: "6p", n:6, l:1},
-  {orbital: "7s", n:7, l:0}
+  {orbital: "7s", n:7, l:0}, {orbital: "5f", n:5, l:3}, {orbital: "6d", n:6, l:2},
+  {orbital: "7p", n:7, l:1}
 ];
 
 const orbitalCapacity = { "s":2, "p":6, "d":10, "f":14 };
 
 const elementSelect = document.getElementById('elementSelect');
+const atomicNumberSlider = document.getElementById('atomicNumberSlider');
+const atomicNumberDisplay = document.getElementById('atomicNumberDisplay');
 const configOutput = document.getElementById('configurationOutput');
 const diagram = document.getElementById('orbitalDiagram');
+const elementProperties = document.getElementById('elementProperties');
 
-// Llenar select
+// Llenar select con elementos
 Object.keys(elements).forEach(sym => {
   const option = document.createElement('option');
   option.value = sym;
-  option.textContent = `${sym} (${elements[sym]} e⁻)`;
+  option.textContent = `${sym} - ${elements[sym].name} (${elements[sym].Z} e⁻)`;
   elementSelect.appendChild(option);
 });
 
+// Función para generar configuración electrónica
 function generateConfiguration(electrons) {
   let remaining = electrons;
   const config = [];
@@ -142,14 +490,21 @@ function generateConfiguration(electrons) {
     const type = o.orbital[1];
     const cap = orbitalCapacity[type];
     const eCount = Math.min(remaining, cap);
-    if(eCount>0){
-      config.push({orbital:o.orbital, electrons:eCount, n:o.n, l:o.l, capacity: cap});
+    if(eCount > 0){
+      config.push({
+        orbital: o.orbital, 
+        electrons: eCount, 
+        n: o.n, 
+        l: o.l, 
+        capacity: cap
+      });
       remaining -= eCount;
     }
   });
   return config;
 }
 
+// Función para mostrar diagrama de orbitales
 function displayDiagram(config) {
   diagram.innerHTML = '';
   config.forEach(o => {
@@ -157,37 +512,26 @@ function displayDiagram(config) {
     div.classList.add('orbital');
 
     // Nombre del orbital
-    const orbitalLabel = document.createElement('strong');
+    const orbitalLabel = document.createElement('div');
+    orbitalLabel.classList.add('orbital-label');
     orbitalLabel.textContent = o.orbital;
     div.appendChild(orbitalLabel);
 
-    // Números cuánticos arriba de la barra
-    const quantumSpan = document.createElement('span');
-    quantumSpan.style.fontSize = "0.7em";
+    // Números cuánticos
+    const quantumSpan = document.createElement('div');
+    quantumSpan.classList.add('quantum-numbers');
     quantumSpan.textContent = `n=${o.n}, l=${o.l}`;
     div.appendChild(quantumSpan);
 
-    // Contenedor de barra
+    // Barra de orbital
     const barContainer = document.createElement('div');
-    barContainer.style.width = "100%";
-    barContainer.style.height = "40px";
-    barContainer.style.background = "#e8eaf6";
-    barContainer.style.borderRadius = "5px";
-    barContainer.style.position = "relative";
-    barContainer.style.marginTop = "5px";
-
-    // Barra de llenado
+    barContainer.classList.add('orbital-bar');
+    
     const fillDiv = document.createElement('div');
-    fillDiv.style.height = "100%";
+    fillDiv.classList.add('orbital-fill');
     fillDiv.style.width = `${(o.electrons/o.capacity)*100}%`;
-    fillDiv.style.background = `linear-gradient(to top, #3f51b5, #7986cb)`;
-    fillDiv.style.borderRadius = "5px";
-    fillDiv.style.display = "flex";
-    fillDiv.style.alignItems = "center";
-    fillDiv.style.justifyContent = "center";
-    fillDiv.style.color = "white";
     fillDiv.textContent = `${o.electrons}/${o.capacity}`;
-
+    
     barContainer.appendChild(fillDiv);
     div.appendChild(barContainer);
 
@@ -195,22 +539,74 @@ function displayDiagram(config) {
   });
 }
 
+// Función para mostrar información del elemento
+function displayElementInfo(symbol) {
+  const element = elements[symbol];
+  elementProperties.innerHTML = `
+    <div class="property">
+      <div class="property-name">Nombre</div>
+      <div class="property-value">${element.name}</div>
+    </div>
+    <div class="property">
+      <div class="property-name">Símbolo</div>
+      <div class="property-value">${symbol}</div>
+    </div>
+    <div class="property">
+      <div class="property-name">Número atómico</div>
+      <div class="property-value">${element.Z}</div>
+    </div>
+    <div class="property">
+      <div class="property-name">Masa atómica</div>
+      <div class="property-value">${element.mass} u</div>
+    </div>
+    <div class="property">
+      <div class="property-name">Categoría</div>
+      <div class="property-value">${element.category}</div>
+    </div>
+    <div class="property">
+      <div class="property-name">Configuración</div>
+      <div class="property-value">${element.config}</div>
+    </div>
+  `;
+}
 
-
-
+// Event listeners
 elementSelect.addEventListener('change', () => {
   const el = elementSelect.value;
   if(el && elements[el]){
-    const config = generateConfiguration(elements[el]);
-    configOutput.textContent = config.map(c => `${c.orbital}${'^'+c.electrons}`).join(' ');
+    const config = generateConfiguration(elements[el].Z);
+    configOutput.textContent = config.map(c => `${c.orbital}${c.electrons > 1 ? '⁰¹²³⁴⁵⁶⁷⁸⁹'[c.electrons] : c.electrons === 1 ? '¹' : '⁰'}`).join(' ');
     displayDiagram(config);
+    displayElementInfo(el);
+    atomicNumberSlider.value = elements[el].Z;
+    atomicNumberDisplay.textContent = `Número atómico: ${elements[el].Z}`;
   } else {
     configOutput.textContent = "Aquí aparecerá la configuración electrónica.";
     diagram.innerHTML = '';
+    elementProperties.innerHTML = '';
   }
 });
+
+atomicNumberSlider.addEventListener('input', () => {
+  const z = parseInt(atomicNumberSlider.value);
+  atomicNumberDisplay.textContent = `Número atómico: ${z}`;
+  
+  // Encontrar el elemento con este número atómico
+  for (const symbol in elements) {
+    if (elements[symbol].Z === z) {
+      elementSelect.value = symbol;
+      const event = new Event('change');
+      elementSelect.dispatchEvent(event);
+      break;
+    }
+  }
+});
+
+// Inicializar con el primer elemento
+elementSelect.value = "H";
+const event = new Event('change');
+elementSelect.dispatchEvent(event);
 </script>
 
 </body>
 </html>
-
