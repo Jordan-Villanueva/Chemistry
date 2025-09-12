@@ -406,6 +406,110 @@
   </div>
 </div>
 
+<div class="panel" style="margin-top: 30px;">
+  <h2>Reglas de Slater - Cálculo Interactivo de Z<sub>ef</sub></h2>
+  
+  <div class="small" style="margin-bottom: 15px;">
+    <p><strong>Las Reglas de Slater</strong> permiten estimar la carga nuclear efectiva (Z<sub>ef</sub>) que experimenta un electrón en un átomo:</p>
+    <ul>
+      <li><strong>Electrones en la misma subcapa:</strong> 0.35</li>
+      <li><strong>Electrones en s/p de nivel n-1:</strong> 0.85</li>
+      <li><strong>Electrones en s/p de niveles inferiores (n-2 o más):</strong> 1.00</li>
+      <li><strong>Electrones en d/f de niveles más internos:</strong> 1.00</li>
+    </ul>
+    <p>Más detalles en <a href="https://chem.libretexts.org/Courses/Mount_Royal_University/Chem_1201/Unit_2._Periodic_Properties_of_the_Elements/2.06%3A_Slater%27s_Rules" target="_blank">LibreTexts</a>.</p>
+  </div>
+  
+  <div class="orbital-box" style="background: #f3e5f5; padding: 15px; border-radius: 8px;">
+    <h3>Calculadora Interactiva de Z<sub>ef</sub></h3>
+    
+    <div style="margin: 10px 0;">
+      <label for="atom">Número atómico (Z): </label>
+      <input type="number" id="atom" min="1" max="70" value="8" style="width:100px; margin-right: 20px;">
+      
+      <label for="electron">Electrón (ej: 2p, 3s, 3d, 4f): </label>
+      <input type="text" id="electron" placeholder="2p" style="width:60px;">
+      
+      <button class="btn" onclick="calcularSlater()" style="margin-left: 10px;">Calcular Z<sub>ef</sub></button>
+    </div>
+    
+    <div id="slaterFeedback" style="margin-top: 15px; padding: 10px; border-radius: 6px; background: #f5f5f5;"></div>
+  </div>
+</div>
+
+<style>
+#slaterFeedback {
+  font-weight: bold;
+}
+</style>
+
+<script>
+// Subcapa orden: s < p < d < f
+const orbitalOrder = ['1s','2s','2p','3s','3p','4s','3d','4p','5s','4d','5p','6s','4f','5d','6p','7s','5f','6d','7p'];
+
+// Configuración electrónica hasta Z=70 (Générica para cálculo aproximado)
+function generarConfiguracion(Z){
+  const config = [];
+  let remaining = Z;
+  const maxElectrones = {s:2, p:6, d:10, f:14};
+  orbitalOrder.forEach(orb=>{
+    if(remaining<=0) return;
+    const tipo = orb[orb.length-1];
+    const n = parseInt(orb[0]);
+    const cant = Math.min(maxElectrones[tipo], remaining);
+    config.push({orb, tipo, n, e: cant});
+    remaining -= cant;
+  });
+  return config;
+}
+
+function calcularSlater(){
+  const Z = parseInt(document.getElementById('atom').value);
+  const elecInput = document.getElementById('electron').value.trim().toLowerCase();
+  if(!Z || !elecInput) { 
+    document.getElementById('slaterFeedback').textContent="Ingresa Z y electrón."; 
+    return; 
+  }
+
+  const n = parseInt(elecInput[0]);
+  const tipo = elecInput[1];
+  const config = generarConfiguracion(Z);
+
+  // Buscar el electrón objetivo en la configuración
+  let targetIndex = -1;
+  for(let i=0;i<config.length;i++){
+    if(config[i].orb.toLowerCase()===elecInput){targetIndex=i; break;}
+  }
+  if(targetIndex===-1){
+    document.getElementById('slaterFeedback').textContent="Electrón no encontrado en la configuración.";
+    return;
+  }
+
+  // Calcular apantallamiento (S)
+  let S = 0;
+  for(let i=0;i<config.length;i++){
+    const c = config[i];
+    if(i===targetIndex){
+      S += (c.e-1)*0.35; // misma subcapa
+    } else if(c.n === n){
+      // mismo nivel, distinta subcapa: no apantalla para s/p/d/f (aprox)
+      if(c.tipo === tipo) continue;
+    } else if(c.n === n-1){
+      // nivel anterior
+      if(c.tipo==='s'||c.tipo==='p') S += c.e*0.85;
+      else S += c.e*1.00; // d/f
+    } else if(c.n <= n-2){
+      S += c.e*1.00;
+    }
+  }
+
+  const Zef = (Z - S).toFixed(2);
+  document.getElementById('slaterFeedback').innerHTML = `La carga nuclear efectiva Z<sub>ef</sub> para ${elecInput} es ≈ ${Zef}`;
+}
+</script>
+
+
+
 <script>
 // Base de datos completa con los 118 elementos
 const elements = {
