@@ -20,38 +20,31 @@
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 2px 6px rgba(10, 10, 10, 0.06);
+      display: none; /* Oculto hasta login */
     }
     
-    h2 {
-      color: #2b7a78;
-      margin-top: 0;
-    }
-    
+    h2 { color: #2b7a78; margin-top: 0; }
     select, button {
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 6px;
-      border: 1px solid #ddd;
+      padding: 10px; margin: 10px 0;
+      border-radius: 6px; border: 1px solid #ddd;
     }
-    
     button {
-      background: #2b7a78;
-      color: white;
-      border: none;
-      cursor: pointer;
+      background: #2b7a78; color: white; border: none; cursor: pointer;
     }
+    button:hover { background: #1f5f5d; }
     
-    button:hover {
-      background: #1f5f5d;
-    }
-    
-    #topicContent {
-      max-width: 1200px;
-      margin: 24px auto;
-    }
+    #topicContent { max-width: 1200px; margin: 24px auto; }
+    #authMessage { max-width: 600px; margin: 0 auto; text-align: center; color: #d9534f; }
   </style>
 </head>
 <body>
+  <div style="text-align:center; margin-bottom: 16px;">
+    <button id="login-btn">Iniciar Sesión</button>
+    <button id="logout-btn" style="display:none;">Cerrar Sesión</button>
+  </div>
+
+  <div id="authMessage"></div>
+
   <div id="mainMenu">
     <h2>Seleccione un tema de química</h2>
     <select id="topicSelect">
@@ -64,38 +57,8 @@
 
   <div id="topicContent"></div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const topicContent = document.getElementById('topicContent');
-
-      document.getElementById('loadTopic').addEventListener('click', () => {
-        const topic = document.getElementById('topicSelect').value;
-
-        if (!topic) {
-          topicContent.innerHTML = "<p>Por favor, selecciona un tema.</p>";
-          return;
-        }
-
-        // Carga el archivo HTML del tema
-        fetch(`topics/${topic}.html`)
-          .then(response => {
-            if (!response.ok) throw new Error('No se pudo cargar el tema');
-            return response.text();
-          })
-          .then(html => {
-            topicContent.innerHTML = html;
-            
-            // Ejecutar scripts dentro del contenido cargado
-            const scripts = topicContent.querySelectorAll('script');
-            scripts.forEach(oldScript => {
-              const newScript = document.createElement('script');
-              newScript.text = oldScript.text;
-              document.body.appendChild(newScript).parentNode.removeChild(newScript);
-            });
-          })
-          .catch(err => topicContent.innerHTML = `<p>Error: ${err.message}</p>`);
-      });
-    });
-  </script>
+  <script src="auth.js"></script>
+  <script src="chemistry.js"></script>
 </body>
 </html>
+

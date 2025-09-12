@@ -438,7 +438,9 @@
           <strong>Demostración de rayos catódicos</strong>
           <p class="small">Observa cómo las partículas (electrones) se mueven dentro del tubo de Crookes vacío.</p>
           <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/7YHwMWcXfLE" title="Rayos catódicos" allowfullscreen></iframe>
+            <iframe src="https://www.youtube.com/embed/nynb_kjXYWU"  title="Rayos catódicos" 
+             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen></iframe>
           </div>
         `;
         extraControls.appendChild(videoDiv);
@@ -465,7 +467,9 @@
           <div style="margin-top:12px">
             <strong>Video del experimento de Rutherford</strong>
             <div class="video-container">
-              <iframe src="https://www.youtube.com/embed/XBqHkraf8iE" title="Experimento de Rutherford" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/SQqCCrv_Cws" title="Experimento de Rutherford" 
+               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowfullscreen></iframe>
             </div>
           </div>
           <div class="small" style="margin-top:10px">
@@ -502,9 +506,20 @@
           <p class="small">Observa cómo los electrones se mueven en órbitas discretas alrededor del núcleo y cómo emiten o absorben energía al cambiar de nivel.</p>
 
           <div style="margin-top:8px">
-            <strong>Video: Transiciones electrónicas</strong>
+            <strong>Video: Espectro de abrsoción del sodio </strong>
             <div class="video-container">
-              <iframe src="https://www.youtube.com/embed/GhAn8xZQ-d8" title="Modelo de Bohr" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/7u3rRy97m9Y" title="Espectro de abrsoción del sodio" 
+               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+               allowfullscreen></iframe>
+            </div>
+          </div>
+          
+            <div style="margin-top:8px">
+            <strong>Video: Espectro de emisión de diversos elementos</strong>
+            <div class="video-container">
+              <iframe src="https://www.youtube.com/embed/m69GjvN3n0M" title="Espectro de emisión de diversos elementos" 
+               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowfullscreen></iframe>
             </div>
           </div>
         `;
@@ -534,45 +549,44 @@
       animRunning = false;
     }
 
-    function initThomsonElectrons() {
-      thomsonElectrons = [];
-      const w = visCanvas.width, h = visCanvas.height;
-      const centerX = w/2, centerY = h/2;
-      
-      for(let i=0; i<15; i++){
-        const ang = Math.random() * Math.PI * 2;
-        const rad = 20 + Math.random() * (Math.min(w, h) * 0.3); // Ajustar según tamaño del canvas
-        const speed = 0.5 + Math.random() * 1.5;
-        
-        thomsonElectrons.push({
-          angle: ang,
-          radius: rad,
-          speed: speed,
-          x: centerX + Math.cos(ang) * rad,
-          y: centerY + Math.sin(ang) * rad
-        });
-      }
-    }
+	function initThomsonElectrons() {
+	  thomsonElectrons = [];
+	  const w = visCanvas.width, h = visCanvas.height;
+	  const centerX = w/2, centerY = h/2;
+	  const maxRadius = Math.min(135, w * 0.3, h * 0.3); // radio máximo seguro dentro del pudín
+	  const minRadius = 20; // para que no queden pegados al centro
 
-    function animateThomson() {
-      if (!animRunning || currentModel.id !== 'thomson') return;
-      
-      const w = visCanvas.width, h = visCanvas.height;
-      const centerX = w/2, centerY = h/2;
-      
-      // Actualizar posiciones de electrones
-      thomsonElectrons.forEach(electron => {
-        electron.angle += 0.02 * electron.speed;
-        electron.x = centerX + Math.cos(electron.angle) * electron.radius;
-        electron.y = centerY + Math.sin(electron.angle) * electron.radius;
-      });
-      
-      // Redibujar
-      drawThomson();
-      
-      // Continuar animación
-      thomsonAnimationId = requestAnimationFrame(animateThomson);
-    }
+	  for(let i=0; i<15; i++){
+	    const ang = Math.random() * Math.PI * 2;
+	    const rad = minRadius + Math.random() * (maxRadius - minRadius);
+	    const speed = 0.01 + Math.random() * 0.02; // velocidad más suave
+
+	    thomsonElectrons.push({
+	      angle: ang,
+	      radius: rad,
+	      speed: speed,
+	      x: centerX + Math.cos(ang) * rad,
+	      y: centerY + Math.sin(ang) * rad
+	    });
+	  }
+	}
+
+	function animateThomson() {
+	  if (!animRunning || currentModel.id !== 'thomson') return;
+
+	  const w = visCanvas.width, h = visCanvas.height;
+	  const centerX = w/2, centerY = h/2;
+
+	  thomsonElectrons.forEach(e => {
+	    e.angle += e.speed;
+	    e.x = centerX + Math.cos(e.angle) * e.radius;
+	    e.y = centerY + Math.sin(e.angle) * e.radius;
+	  });
+
+	  drawThomson();
+
+	  thomsonAnimationId = requestAnimationFrame(animateThomson);
+	}
 
     function renderExercise(m){
       exerciseArea.innerHTML = '';
@@ -1125,5 +1139,8 @@
     initMatch();
     selectModel('dalton', MODELS[0]._btn);
   </script>
+  
+<!-- Auth0 -->
+<script src="../auth.js"></script>
 </body>
 </html>

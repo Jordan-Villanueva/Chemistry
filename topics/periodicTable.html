@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Configuraciones Electrónicas y Números Cuánticos</title>
+<title>Configuraciones Electrónicas - 118 Elementos</title>
 <style>
   :root {
     --primary: #1a237e;
@@ -19,6 +19,16 @@
     --success: #43a047;
     --warning: #ffa000;
     --error: #d32f2f;
+    --nonmetal: #3caea3;
+    --noble-gas: #ff6f61;
+    --alkali-metal: #f6d55c;
+    --alkaline-earth: #ed553b;
+    --metalloid: #9c7bb9;
+    --halogen: #20639b;
+    --metal: #173f5f;
+    --transition-metal: #5c4b9b;
+    --lanthanide: #8ac6d1;
+    --actinide: #f39189;
   }
   
   * {
@@ -237,6 +247,17 @@
     border-radius: 4px;
   }
   
+  .category-nonmetal { background-color: var(--nonmetal); }
+  .category-noble-gas { background-color: var(--noble-gas); }
+  .category-alkali-metal { background-color: var(--alkali-metal); }
+  .category-alkaline-earth { background-color: var(--alkaline-earth); }
+  .category-metalloid { background-color: var(--metalloid); }
+  .category-halogen { background-color: var(--halogen); }
+  .category-metal { background-color: var(--metal); }
+  .category-transition-metal { background-color: var(--transition-metal); }
+  .category-lanthanide { background-color: var(--lanthanide); }
+  .category-actinide { background-color: var(--actinide); }
+  
   @media (max-width: 768px) {
     .flex-container {
       flex-direction: column;
@@ -244,6 +265,23 @@
     
     .orbital {
       width: 85px;
+      padding: 10px 5px;
+    }
+    
+    .orbital-label {
+      font-size: 1rem;
+    }
+    
+    .quantum-numbers {
+      font-size: 0.7rem;
+    }
+    
+    .orbital-bar {
+      height: 30px;
+    }
+    
+    .orbital-fill {
+      font-size: 0.8rem;
     }
     
     h1 {
@@ -252,6 +290,15 @@
     
     h2 {
       font-size: 1.5rem;
+    }
+    
+    .output {
+      padding: 15px;
+      font-size: 1rem;
+    }
+    
+    .config-text {
+      font-size: 1rem;
     }
   }
   
@@ -266,11 +313,33 @@
     color: var(--text-secondary);
   }
   
-  .highlight {
-    background: linear-gradient(120deg, #ffeb3b 0%, #ffeb3b 100%);
-    background-repeat: no-repeat;
-    background-size: 100% 40%;
-    background-position: 0 90%;
+  .config-text {
+    font-family: 'Courier New', monospace;
+    font-size: 1.2rem;
+    line-height: 1.8;
+  }
+  
+  .superscript {
+    vertical-align: super;
+    font-size: 0.8em;
+  }
+  
+  .element-category {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: white;
+    font-weight: bold;
+    font-size: 0.8rem;
+    margin-left: 8px;
+  }
+  
+  /* Solución alternativa para superíndices en móviles */
+  .config-sup {
+    position: relative;
+    font-size: 0.8em;
+    vertical-align: super;
+    line-height: 0;
   }
 </style>
 </head>
@@ -278,8 +347,8 @@
 
 <div class="container">
   <header>
-    <h1>Configuraciones Electrónicas y Números Cuánticos</h1>
-    <p class="subtitle">Explora más de 70 elementos de la tabla periódica</p>
+    <h1>Configuraciones Electrónicas - 118 Elementos</h1>
+    <p class="subtitle">Explora todos los elementos de la tabla periódica</p>
   </header>
 
   <div class="flex-container">
@@ -333,126 +402,126 @@
 </div>
 
 <script>
-// Base de datos ampliada de elementos
+// Base de datos completa con los 118 elementos
 const elements = {
-  "H": {Z:1, name:"Hidrógeno", mass:1.008, category:"No metal", config:"1s¹"},
-  "He": {Z:2, name:"Helio", mass:4.003, category:"Gas noble", config:"1s²"},
-  "Li": {Z:3, name:"Litio", mass:6.94, category:"Metal alcalino", config:"1s² 2s¹"},
-  "Be": {Z:4, name:"Berilio", mass:9.012, category:"Metal alcalinotérreo", config:"1s² 2s²"},
-  "B": {Z:5, name:"Boro", mass:10.81, category:"Metaloide", config:"1s² 2s² 2p¹"},
-  "C": {Z:6, name:"Carbono", mass:12.01, category:"No metal", config:"1s² 2s² 2p²"},
-  "N": {Z:7, name:"Nitrógeno", mass:14.01, category:"No metal", config:"1s² 2s² 2p³"},
-  "O": {Z:8, name:"Oxígeno", mass:16.00, category:"No metal", config:"1s² 2s² 2p⁴"},
-  "F": {Z:9, name:"Flúor", mass:19.00, category:"Halógeno", config:"1s² 2s² 2p⁵"},
-  "Ne": {Z:10, name:"Neón", mass:20.18, category:"Gas noble", config:"1s² 2s² 2p⁶"},
-  "Na": {Z:11, name:"Sodio", mass:22.99, category:"Metal alcalino", config:"[Ne] 3s¹"},
-  "Mg": {Z:12, name:"Magnesio", mass:24.31, category:"Metal alcalinotérreo", config:"[Ne] 3s²"},
-  "Al": {Z:13, name:"Aluminio", mass:26.98, category:"Metal", config:"[Ne] 3s² 3p¹"},
-  "Si": {Z:14, name:"Silicio", mass:28.09, category:"Metaloide", config:"[Ne] 3s² 3p²"},
-  "P": {Z:15, name:"Fósforo", mass:30.97, category:"No metal", config:"[Ne] 3s² 3p³"},
-  "S": {Z:16, name:"Azufre", mass:32.07, category:"No metal", config:"[Ne] 3s² 3p⁴"},
-  "Cl": {Z:17, name:"Cloro", mass:35.45, category:"Halógeno", config:"[Ne] 3s² 3p⁵"},
-  "Ar": {Z:18, name:"Argón", mass:39.95, category:"Gas noble", config:"[Ne] 3s² 3p⁶"},
-  "K": {Z:19, name:"Potasio", mass:39.10, category:"Metal alcalino", config:"[Ar] 4s¹"},
-  "Ca": {Z:20, name:"Calcio", mass:40.08, category:"Metal alcalinotérreo", config:"[Ar] 4s²"},
-  "Sc": {Z:21, name:"Escandio", mass:44.96, category:"Metal de transición", config:"[Ar] 3d¹ 4s²"},
-  "Ti": {Z:22, name:"Titanio", mass:47.87, category:"Metal de transición", config:"[Ar] 3d² 4s²"},
-  "V": {Z:23, name:"Vanadio", mass:50.94, category:"Metal de transición", config:"[Ar] 3d³ 4s²"},
-  "Cr": {Z:24, name:"Cromo", mass:52.00, category:"Metal de transición", config:"[Ar] 3d⁵ 4s¹"},
-  "Mn": {Z:25, name:"Manganeso", mass:54.94, category:"Metal de transición", config:"[Ar] 3d⁵ 4s²"},
-  "Fe": {Z:26, name:"Hierro", mass:55.85, category:"Metal de transición", config:"[Ar] 3d⁶ 4s²"},
-  "Co": {Z:27, name:"Cobalto", mass:58.93, category:"Metal de transición", config:"[Ar] 3d⁷ 4s²"},
-  "Ni": {Z:28, name:"Níquel", mass:58.69, category:"Metal de transición", config:"[Ar] 3d⁸ 4s²"},
-  "Cu": {Z:29, name:"Cobre", mass:63.55, category:"Metal de transición", config:"[Ar] 3d¹⁰ 4s¹"},
-  "Zn": {Z:30, name:"Zinc", mass:65.38, category:"Metal de transición", config:"[Ar] 3d¹⁰ 4s²"},
-  "Ga": {Z:31, name:"Galio", mass:69.72, category:"Metal", config:"[Ar] 3d¹⁰ 4s² 4p¹"},
-  "Ge": {Z:32, name:"Germanio", mass:72.63, category:"Metaloide", config:"[Ar] 3d¹⁰ 4s² 4p²"},
-  "As": {Z:33, name:"Arsénico", mass:74.92, category:"Metaloide", config:"[Ar] 3d¹⁰ 4s² 4p³"},
-  "Se": {Z:34, name:"Selenio", mass:78.97, category:"No metal", config:"[Ar] 3d¹⁰ 4s² 4p⁴"},
-  "Br": {Z:35, name:"Bromo", mass:79.90, category:"Halógeno", config:"[Ar] 3d¹⁰ 4s² 4p⁵"},
-  "Kr": {Z:36, name:"Kriptón", mass:83.80, category:"Gas noble", config:"[Ar] 3d¹⁰ 4s² 4p⁶"},
-  "Rb": {Z:37, name:"Rubidio", mass:85.47, category:"Metal alcalino", config:"[Kr] 5s¹"},
-  "Sr": {Z:38, name:"Estroncio", mass:87.62, category:"Metal alcalinotérreo", config:"[Kr] 5s²"},
-  "Y": {Z:39, name:"Itrio", mass:88.91, category:"Metal de transición", config:"[Kr] 4d¹ 5s²"},
-  "Zr": {Z:40, name:"Circonio", mass:91.22, category:"Metal de transición", config:"[Kr] 4d² 5s²"},
-  "Nb": {Z:41, name:"Niobio", mass:92.91, category:"Metal de transición", config:"[Kr] 4d⁴ 5s¹"},
-  "Mo": {Z:42, name:"Molibdeno", mass:95.95, category:"Metal de transición", config:"[Kr] 4d⁵ 5s¹"},
-  "Tc": {Z:43, name:"Tecnecio", mass:98.00, category:"Metal de transición", config:"[Kr] 4d⁵ 5s²"},
-  "Ru": {Z:44, name:"Rutenio", mass:101.1, category:"Metal de transición", config:"[Kr] 4d⁷ 5s¹"},
-  "Rh": {Z:45, name:"Rodio", mass:102.9, category:"Metal de transición", config:"[Kr] 4d⁸ 5s¹"},
-  "Pd": {Z:46, name:"Paladio", mass:106.4, category:"Metal de transición", config:"[Kr] 4d¹⁰"},
-  "Ag": {Z:47, name:"Plata", mass:107.9, category:"Metal de transición", config:"[Kr] 4d¹⁰ 5s¹"},
-  "Cd": {Z:48, name:"Cadmio", mass:112.4, category:"Metal de transición", config:"[Kr] 4d¹⁰ 5s²"},
-  "In": {Z:49, name:"Indio", mass:114.8, category:"Metal", config:"[Kr] 4d¹⁰ 5s² 5p¹"},
-  "Sn": {Z:50, name:"Estaño", mass:118.7, category:"Metal", config:"[Kr] 4d¹⁰ 5s² 5p²"},
-  "Sb": {Z:51, name:"Antimonio", mass:121.8, category:"Metaloide", config:"[Kr] 4d¹⁰ 5s² 5p³"},
-  "Te": {Z:52, name:"Telurio", mass:127.6, category:"Metaloide", config:"[Kr] 4d¹⁰ 5s² 5p⁴"},
-  "I": {Z:53, name:"Yodo", mass:126.9, category:"Halógeno", config:"[Kr] 4d¹⁰ 5s² 5p⁵"},
-  "Xe": {Z:54, name:"Xenón", mass:131.3, category:"Gas noble", config:"[Kr] 4d¹⁰ 5s² 5p⁶"},
-  "Cs": {Z:55, name:"Cesio", mass:132.9, category:"Metal alcalino", config:"[Xe] 6s¹"},
-  "Ba": {Z:56, name:"Bario", mass:137.3, category:"Metal alcalinotérreo", config:"[Xe] 6s²"},
-  "La": {Z:57, name:"Lantano", mass:138.9, category:"Lantánido", config:"[Xe] 5d¹ 6s²"},
-  "Ce": {Z:58, name:"Cerio", mass:140.1, category:"Lantánido", config:"[Xe] 4f¹ 5d¹ 6s²"},
-  "Pr": {Z:59, name:"Praseodimio", mass:140.9, category:"Lantánido", config:"[Xe] 4f³ 6s²"},
-  "Nd": {Z:60, name:"Neodimio", mass:144.2, category:"Lantánido", config:"[Xe] 4f⁴ 6s²"},
-  "Pm": {Z:61, name:"Promecio", mass:145.0, category:"Lantánido", config:"[Xe] 4f⁵ 6s²"},
-  "Sm": {Z:62, name:"Samario", mass:150.4, category:"Lantánido", config:"[Xe] 4f⁶ 6s²"},
-  "Eu": {Z:63, name:"Europio", mass:152.0, category:"Lantánido", config:"[Xe] 4f⁷ 6s²"},
-  "Gd": {Z:64, name:"Gadolinio", mass:157.3, category:"Lantánido", config:"[Xe] 4f⁷ 5d¹ 6s²"},
-  "Tb": {Z:65, name:"Terbio", mass:158.9, category:"Lantánido", config:"[Xe] 4f⁹ 6s²"},
-  "Dy": {Z:66, name:"Disprosio", mass:162.5, category:"Lantánido", config:"[Xe] 4f¹⁰ 6s²"},
-  "Ho": {Z:67, name:"Holmio", mass:164.9, category:"Lantánido", config:"[Xe] 4f¹¹ 6s²"},
-  "Er": {Z:68, name:"Erbio", mass:167.3, category:"Lantánido", config:"[Xe] 4f¹² 6s²"},
-  "Tm": {Z:69, name:"Tulio", mass:168.9, category:"Lantánido", config:"[Xe] 4f¹³ 6s²"},
-  "Yb": {Z:70, name:"Iterbio", mass:173.1, category:"Lantánido", config:"[Xe] 4f¹⁴ 6s²"},
-  "Lu": {Z:71, name:"Lutecio", mass:175.0, category:"Lantánido", config:"[Xe] 4f¹⁴ 5d¹ 6s²"},
-  "Hf": {Z:72, name:"Hafnio", mass:178.5, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d² 6s²"},
-  "Ta": {Z:73, name:"Tantalio", mass:180.9, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d³ 6s²"},
-  "W": {Z:74, name:"Wolframio", mass:183.8, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d⁴ 6s²"},
-  "Re": {Z:75, name:"Renio", mass:186.2, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d⁵ 6s²"},
-  "Os": {Z:76, name:"Osmio", mass:190.2, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d⁶ 6s²"},
-  "Ir": {Z:77, name:"Iridio", mass:192.2, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d⁷ 6s²"},
-  "Pt": {Z:78, name:"Platino", mass:195.1, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d⁹ 6s¹"},
-  "Au": {Z:79, name:"Oro", mass:197.0, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s¹"},
-  "Hg": {Z:80, name:"Mercurio", mass:200.6, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s²"},
-  "Tl": {Z:81, name:"Talio", mass:204.4, category:"Metal", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p¹"},
-  "Pb": {Z:82, name:"Plomo", mass:207.2, category:"Metal", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p²"},
-  "Bi": {Z:83, name:"Bismuto", mass:209.0, category:"Metal", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p³"},
-  "Po": {Z:84, name:"Polonio", mass:209.0, category:"Metaloide", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁴"},
-  "At": {Z:85, name:"Astato", mass:210.0, category:"Halógeno", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁵"},
-  "Rn": {Z:86, name:"Radón", mass:222.0, category:"Gas noble", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁶"},
-  "Fr": {Z:87, name:"Francio", mass:223.0, category:"Metal alcalino", config:"[Rn] 7s¹"},
-  "Ra": {Z:88, name:"Radio", mass:226.0, category:"Metal alcalinotérreo", config:"[Rn] 7s²"},
-  "Ac": {Z:89, name:"Actinio", mass:227.0, category:"Actínido", config:"[Rn] 6d¹ 7s²"},
-  "Th": {Z:90, name:"Torio", mass:232.0, category:"Actínido", config:"[Rn] 6d² 7s²"},
-  "Pa": {Z:91, name:"Protactinio", mass:231.0, category:"Actínido", config:"[Rn] 5f² 6d¹ 7s²"},
-  "U": {Z:92, name:"Uranio", mass:238.0, category:"Actínido", config:"[Rn] 5f³ 6d¹ 7s²"},
-  "Np": {Z:93, name:"Neptunio", mass:237.0, category:"Actínido", config:"[Rn] 5f⁴ 6d¹ 7s²"},
-  "Pu": {Z:94, name:"Plutonio", mass:244.0, category:"Actínido", config:"[Rn] 5f⁶ 7s²"},
-  "Am": {Z:95, name:"Americio", mass:243.0, category:"Actínido", config:"[Rn] 5f⁷ 7s²"},
-  "Cm": {Z:96, name:"Curio", mass:247.0, category:"Actínido", config:"[Rn] 5f⁷ 6d¹ 7s²"},
-  "Bk": {Z:97, name:"Berkelio", mass:247.0, category:"Actínido", config:"[Rn] 5f⁹ 7s²"},
-  "Cf": {Z:98, name:"Californio", mass:251.0, category:"Actínido", config:"[Rn] 5f¹⁰ 7s²"},
-  "Es": {Z:99, name:"Einstenio", mass:252.0, category:"Actínido", config:"[Rn] 5f¹¹ 7s²"},
-  "Fm": {Z:100, name:"Fermio", mass:257.0, category:"Actínido", config:"[Rn] 5f¹² 7s²"},
-  "Md": {Z:101, name:"Mendelevio", mass:258.0, category:"Actínido", config:"[Rn] 5f¹³ 7s²"},
-  "No": {Z:102, name:"Nobelio", mass:259.0, category:"Actínido", config:"[Rn] 5f¹⁴ 7s²"},
-  "Lr": {Z:103, name:"Laurencio", mass:262.0, category:"Actínido", config:"[Rn] 5f¹⁴ 7s² 7p¹"},
-  "Rf": {Z:104, name:"Rutherfordio", mass:267.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d² 7s²"},
-  "Db": {Z:105, name:"Dubnio", mass:268.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d³ 7s²"},
-  "Sg": {Z:106, name:"Seaborgio", mass:269.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d⁴ 7s²"},
-  "Bh": {Z:107, name:"Bohrio", mass:270.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d⁵ 7s²"},
-  "Hs": {Z:108, name:"Hassio", mass:277.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d⁶ 7s²"},
-  "Mt": {Z:109, name:"Meitnerio", mass:278.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d⁷ 7s²"},
-  "Ds": {Z:110, name:"Darmstatio", mass:281.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d⁹ 7s¹"},
-  "Rg": {Z:111, name:"Roentgenio", mass:282.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s¹"},
-  "Cn": {Z:112, name:"Copernicio", mass:285.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s²"},
-  "Nh": {Z:113, name:"Nihonio", mass:286.0, category:"Metal", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p¹"},
-  "Fl": {Z:114, name:"Flerovio", mass:289.0, category:"Metal", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p²"},
-  "Mc": {Z:115, name:"Moscovio", mass:290.0, category:"Metal", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p³"},
-  "Lv": {Z:116, name:"Livermorio", mass:293.0, category:"Metal", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁴"},
-  "Ts": {Z:117, name:"Teneso", mass:294.0, category:"Halógeno", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁵"},
-  "Og": {Z:118, name:"Oganesón", mass:294.0, category:"Gas noble", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶"}
+  "H": {Z:1, name:"Hidrógeno", mass:1.008, category:"No metal", config:"1s¹", categoryClass: "category-nonmetal"},
+  "He": {Z:2, name:"Helio", mass:4.003, category:"Gas noble", config:"1s²", categoryClass: "category-noble-gas"},
+  "Li": {Z:3, name:"Litio", mass:6.94, category:"Metal alcalino", config:"1s² 2s¹", categoryClass: "category-alkali-metal"},
+  "Be": {Z:4, name:"Berilio", mass:9.012, category:"Metal alcalinotérreo", config:"1s² 2s²", categoryClass: "category-alkaline-earth"},
+  "B": {Z:5, name:"Boro", mass:10.81, category:"Metaloide", config:"1s² 2s² 2p¹", categoryClass: "category-metalloid"},
+  "C": {Z:6, name:"Carbono", mass:12.01, category:"No metal", config:"1s² 2s² 2p²", categoryClass: "category-nonmetal"},
+  "N": {Z:7, name:"Nitrógeno", mass:14.01, category:"No metal", config:"1s² 2s² 2p³", categoryClass: "category-nonmetal"},
+  "O": {Z:8, name:"Oxígeno", mass:16.00, category:"No metal", config:"1s² 2s² 2p⁴", categoryClass: "category-nonmetal"},
+  "F": {Z:9, name:"Flúor", mass:19.00, category:"Halógeno", config:"1s² 2s² 2p⁵", categoryClass: "category-halogen"},
+  "Ne": {Z:10, name:"Neón", mass:20.18, category:"Gas noble", config:"1s² 2s² 2p⁶", categoryClass: "category-noble-gas"},
+  "Na": {Z:11, name:"Sodio", mass:22.99, category:"Metal alcalino", config:"[Ne] 3s¹", categoryClass: "category-alkali-metal"},
+  "Mg": {Z:12, name:"Magnesio", mass:24.31, category:"Metal alcalinotérreo", config:"[Ne] 3s²", categoryClass: "category-alkaline-earth"},
+  "Al": {Z:13, name:"Aluminio", mass:26.98, category:"Metal", config:"[Ne] 3s² 3p¹", categoryClass: "category-metal"},
+  "Si": {Z:14, name:"Silicio", mass:28.09, category:"Metaloide", config:"[Ne] 3s² 3p²", categoryClass: "category-metalloid"},
+  "P": {Z:15, name:"Fósforo", mass:30.97, category:"No metal", config:"[Ne] 3s² 3p³", categoryClass: "category-nonmetal"},
+  "S": {Z:16, name:"Azufre", mass:32.07, category:"No metal", config:"[Ne] 3s² 3p⁴", categoryClass: "category-nonmetal"},
+  "Cl": {Z:17, name:"Cloro", mass:35.45, category:"Halógeno", config:"[Ne] 3s² 3p⁵", categoryClass: "category-halogen"},
+  "Ar": {Z:18, name:"Argón", mass:39.95, category:"Gas noble", config:"[Ne] 3s² 3p⁶", categoryClass: "category-noble-gas"},
+  "K": {Z:19, name:"Potasio", mass:39.10, category:"Metal alcalino", config:"[Ar] 4s¹", categoryClass: "category-alkali-metal"},
+  "Ca": {Z:20, name:"Calcio", mass:40.08, category:"Metal alcalinotérreo", config:"[Ar] 4s²", categoryClass: "category-alkaline-earth"},
+  "Sc": {Z:21, name:"Escandio", mass:44.96, category:"Metal de transición", config:"[Ar] 3d¹ 4s²", categoryClass: "category-transition-metal"},
+  "Ti": {Z:22, name:"Titanio", mass:47.87, category:"Metal de transición", config:"[Ar] 3d² 4s²", categoryClass: "category-transition-metal"},
+  "V": {Z:23, name:"Vanadio", mass:50.94, category:"Metal de transición", config:"[Ar] 3d³ 4s²", categoryClass: "category-transition-metal"},
+  "Cr": {Z:24, name:"Cromo", mass:52.00, category:"Metal de transición", config:"[Ar] 3d⁵ 4s¹", categoryClass: "category-transition-metal"},
+  "Mn": {Z:25, name:"Manganeso", mass:54.94, category:"Metal de transición", config:"[Ar] 3d⁵ 4s²", categoryClass: "category-transition-metal"},
+  "Fe": {Z:26, name:"Hierro", mass:55.85, category:"Metal de transición", config:"[Ar] 3d⁶ 4s²", categoryClass: "category-transition-metal"},
+  "Co": {Z:27, name:"Cobalto", mass:58.93, category:"Metal de transición", config:"[Ar] 3d⁷ 4s²", categoryClass: "category-transition-metal"},
+  "Ni": {Z:28, name:"Níquel", mass:58.69, category:"Metal de transición", config:"[Ar] 3d⁸ 4s²", categoryClass: "category-transition-metal"},
+  "Cu": {Z:29, name:"Cobre", mass:63.55, category:"Metal de transición", config:"[Ar] 3d¹⁰ 4s¹", categoryClass: "category-transition-metal"},
+  "Zn": {Z:30, name:"Zinc", mass:65.38, category:"Metal de transición", config:"[Ar] 3d¹⁰ 4s²", categoryClass: "category-transition-metal"},
+  "Ga": {Z:31, name:"Galio", mass:69.72, category:"Metal", config:"[Ar] 3d¹⁰ 4s² 4p¹", categoryClass: "category-metal"},
+  "Ge": {Z:32, name:"Germanio", mass:72.63, category:"Metaloide", config:"[Ar] 3d¹⁰ 4s² 4p²", categoryClass: "category-metalloid"},
+  "As": {Z:33, name:"Arsénico", mass:74.92, category:"Metaloide", config:"[Ar] 3d¹⁰ 4s² 4p³", categoryClass: "category-metalloid"},
+  "Se": {Z:34, name:"Selenio", mass:78.97, category:"No metal", config:"[Ar] 3d¹⁰ 4s² 4p⁴", categoryClass: "category-nonmetal"},
+  "Br": {Z:35, name:"Bromo", mass:79.90, category:"Halógeno", config:"[Ar] 3d¹⁰ 4s² 4p⁵", categoryClass: "category-halogen"},
+  "Kr": {Z:36, name:"Kriptón", mass:83.80, category:"Gas noble", config:"[Ar] 3d¹⁰ 4s² 4p⁶", categoryClass: "category-noble-gas"},
+  "Rb": {Z:37, name:"Rubidio", mass:85.47, category:"Metal alcalino", config:"[Kr] 5s¹", categoryClass: "category-alkali-metal"},
+  "Sr": {Z:38, name:"Estroncio", mass:87.62, category:"Metal alcalinotérreo", config:"[Kr] 5s²", categoryClass: "category-alkaline-earth"},
+  "Y": {Z:39, name:"Itrio", mass:88.91, category:"Metal de transición", config:"[Kr] 4d¹ 5s²", categoryClass: "category-transition-metal"},
+  "Zr": {Z:40, name:"Circonio", mass:91.22, category:"Metal de transición", config:"[Kr] 4d² 5s²", categoryClass: "category-transition-metal"},
+  "Nb": {Z:41, name:"Niobio", mass:92.91, category:"Metal de transición", config:"[Kr] 4d⁴ 5s¹", categoryClass: "category-transition-metal"},
+  "Mo": {Z:42, name:"Molibdeno", mass:95.95, category:"Metal de transición", config:"[Kr] 4d⁵ 5s¹", categoryClass: "category-transition-metal"},
+  "Tc": {Z:43, name:"Tecnecio", mass:98.00, category:"Metal de transición", config:"[Kr] 4d⁵ 5s²", categoryClass: "category-transition-metal"},
+  "Ru": {Z:44, name:"Rutenio", mass:101.1, category:"Metal de transición", config:"[Kr] 4d⁷ 5s¹", categoryClass: "category-transition-metal"},
+  "Rh": {Z:45, name:"Rodio", mass:102.9, category:"Metal de transición", config:"[Kr] 4d⁴ 5s¹", categoryClass: "category-transition-metal"},
+  "Pd": {Z:46, name:"Paladio", mass:106.4, category:"Metal de transición", config:"[Kr] 4d¹⁰", categoryClass: "category-transition-metal"},
+  "Ag": {Z:47, name:"Plata", mass:107.9, category:"Metal de transición", config:"[Kr] 4d¹⁰ 5s¹", categoryClass: "category-transition-metal"},
+  "Cd": {Z:48, name:"Cadmio", mass:112.4, category:"Metal de transición", config:"[Kr] 4d¹⁰ 5s²", categoryClass: "category-transition-metal"},
+  "In": {Z:49, name:"Indio", mass:114.8, category:"Metal", config:"[Kr] 4d¹⁰ 5s² 5p¹", categoryClass: "category-metal"},
+  "Sn": {Z:50, name:"Estaño", mass:118.7, category:"Metal", config:"[Kr] 4d¹⁰ 5s² 5p²", categoryClass: "category-metal"},
+  "Sb": {Z:51, name:"Antimonio", mass:121.8, category:"Metaloide", config:"[Kr] 4d¹⁰ 5s² 5p³", categoryClass: "category-metalloid"},
+  "Te": {Z:52, name:"Telurio", mass:127.6, category:"Metaloide", config:"[Kr] 4d¹⁰ 5s² 5p⁴", categoryClass: "category-metalloid"},
+  "I": {Z:53, name:"Yodo", mass:126.9, category:"Halógeno", config:"[Kr] 4d¹⁰ 5s² 5p⁵", categoryClass: "category-halogen"},
+  "Xe": {Z:54, name:"Xenón", mass:131.3, category:"Gas noble", config:"[Kr] 4d¹⁰ 5s² 5p⁶", categoryClass: "category-noble-gas"},
+  "Cs": {Z:55, name:"Cesio", mass:132.9, category:"Metal alcalino", config:"[Xe] 6s¹", categoryClass: "category-alkali-metal"},
+  "Ba": {Z:56, name:"Bario", mass:137.3, category:"Metal alcalinotérreo", config:"[Xe] 6s²", categoryClass: "category-alkaline-earth"},
+  "La": {Z:57, name:"Lantano", mass:138.9, category:"Lantánido", config:"[Xe] 5d¹ 6s²", categoryClass: "category-lanthanide"},
+  "Ce": {Z:58, name:"Cerio", mass:140.1, category:"Lantánido", config:"[Xe] 4f¹ 5d¹ 6s²", categoryClass: "category-lanthanide"},
+  "Pr": {Z:59, name:"Praseodimio", mass:140.9, category:"Lantánido", config:"[Xe] 4f³ 6s²", categoryClass: "category-lanthanide"},
+  "Nd": {Z:60, name:"Neodimio", mass:144.2, category:"Lantánido", config:"[Xe] 4f⁴ 6s²", categoryClass: "category-lanthanide"},
+  "Pm": {Z:61, name:"Promecio", mass:145.0, category:"Lantánido", config:"[Xe] 4f⁵ 6s²", categoryClass: "category-lanthanide"},
+  "Sm": {Z:62, name:"Samario", mass:150.4, category:"Lantánido", config:"[Xe] 4f⁶ 6s²", categoryClass: "category-lanthanide"},
+  "Eu": {Z:63, name:"Europio", mass:152.0, category:"Lantánido", config:"[Xe] 4f⁷ 6s²", categoryClass: "category-lanthanide"},
+  "Gd": {Z:64, name:"Gadolinio", mass:157.3, category:"Lantánido", config:"[Xe] 4f⁷ 5d¹ 6s²", categoryClass: "category-lanthanide"},
+  "Tb": {Z:65, name:"Terbio", mass:158.9, category:"Lantánido", config:"[Xe] 4f⁹ 6s²", categoryClass: "category-lanthanide"},
+  "Dy": {Z:66, name:"Disprosio", mass:162.5, category:"Lantánido", config:"[Xe] 4f¹⁰ 6s²", categoryClass: "category-lanthanide"},
+  "Ho": {Z:67, name:"Holmio", mass:164.9, category:"Lantánido", config:"[Xe] 4f¹¹ 6s²", categoryClass: "category-lanthanide"},
+  "Er": {Z:68, name:"Erbio", mass:167.3, category:"Lantánido", config:"[Xe] 4f¹² 6s²", categoryClass: "category-lanthanide"},
+  "Tm": {Z:69, name:"Tulio", mass:168.9, category:"Lantánido", config:"[Xe] 4f¹³ 6s²", categoryClass: "category-lanthanide"},
+  "Yb": {Z:70, name:"Iterbio", mass:173.1, category:"Lantánido", config:"[Xe] 4f¹⁴ 6s²", categoryClass: "category-lanthanide"},
+  "Lu": {Z:71, name:"Lutecio", mass:175.0, category:"Lantánido", config:"[Xe] 4f¹⁴ 5d¹ 6s²", categoryClass: "category-lanthanide"},
+  "Hf": {Z:72, name:"Hafnio", mass:178.5, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d² 6s²", categoryClass: "category-transition-metal"},
+  "Ta": {Z:73, name:"Tantalio", mass:180.9, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d³ 6s²", categoryClass: "category-transition-metal"},
+  "W": {Z:74, name:"Wolframio", mass:183.8, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d⁴ 6s²", categoryClass: "category-transition-metal"},
+  "Re": {Z:75, name:"Renio", mass:186.2, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d⁵ 6s²", categoryClass: "category-transition-metal"},
+  "Os": {Z:76, name:"Osmio", mass:190.2, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d⁶ 6s²", categoryClass: "category-transition-metal"},
+  "Ir": {Z:77, name:"Iridio", mass:192.2, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d⁷ 6s²", categoryClass: "category-transition-metal"},
+  "Pt": {Z:78, name:"Platino", mass:195.1, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d⁹ 6s¹", categoryClass: "category-transition-metal"},
+  "Au": {Z:79, name:"Oro", mass:197.0, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s¹", categoryClass: "category-transition-metal"},
+  "Hg": {Z:80, name:"Mercurio", mass:200.6, category:"Metal de transición", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s²", categoryClass: "category-transition-metal"},
+  "Tl": {Z:81, name:"Talio", mass:204.4, category:"Metal", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p¹", categoryClass: "category-metal"},
+  "Pb": {Z:82, name:"Plomo", mass:207.2, category:"Metal", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p²", categoryClass: "category-metal"},
+  "Bi": {Z:83, name:"Bismuto", mass:209.0, category:"Metal", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p³", categoryClass: "category-metal"},
+  "Po": {Z:84, name:"Polonio", mass:209.0, category:"Metaloide", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁴", categoryClass: "category-metalloid"},
+  "At": {Z:85, name:"Astato", mass:210.0, category:"Halógeno", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁵", categoryClass: "category-halogen"},
+  "Rn": {Z:86, name:"Radón", mass:222.0, category:"Gas noble", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p�⑥", categoryClass: "category-noble-gas"},
+  "Fr": {Z:87, name:"Francio", mass:223.0, category:"Metal alcalino", config:"[Rn] 7s¹", categoryClass: "category-alkali-metal"},
+  "Ra": {Z:88, name:"Radio", mass:226.0, category:"Metal alcalinotérreo", config:"[Rn] 7s²", categoryClass: "category-alkaline-earth"},
+  "Ac": {Z:89, name:"Actinio", mass:227.0, category:"Actínido", config:"[Rn] 6d¹ 7s²", categoryClass: "category-actinide"},
+  "Th": {Z:90, name:"Torio", mass:232.0, category:"Actínido", config:"[Rn] 6d² 7s²", categoryClass: "category-actinide"},
+  "Pa": {Z:91, name:"Protactinio", mass:231.0, category:"Actínido", config:"[Rn] 5f² 6d¹ 7s²", categoryClass: "category-actinide"},
+  "U": {Z:92, name:"Uranio", mass:238.0, category:"Actínido", config:"[Rn] 5f³ 6d¹ 7s²", categoryClass: "category-actinide"},
+  "Np": {Z:93, name:"Neptunio", mass:237.0, category:"Actínido", config:"[Rn] 5f⁴ 6d¹ 7s²", categoryClass: "category-actinide"},
+  "Pu": {Z:94, name:"Plutonio", mass:244.0, category:"Actínido", config:"[Rn] 5f⁶ 7s²", categoryClass: "category-actinide"},
+  "Am": {Z:95, name:"Americio", mass:243.0, category:"Actínido", config:"[Rn] 5f⁷ 7s²", categoryClass: "category-actinide"},
+  "Cm": {Z:96, name:"Curio", mass:247.0, category:"Actínido", config:"[Rn] 5f⁷ 6d¹ 7s²", categoryClass: "category-actinide"},
+  "Bk": {Z:97, name:"Berkelio", mass:247.0, category:"Actínido", config:"[Rn] 5f⁹ 7s²", categoryClass: "category-actinide"},
+  "Cf": {Z:98, name:"Californio", mass:251.0, category:"Actínido", config:"[Rn] 5f¹⁰ 7s²", categoryClass: "category-actinide"},
+  "Es": {Z:99, name:"Einstenio", mass:252.0, category:"Actínido", config:"[Rn] 5f¹¹ 7s²", categoryClass: "category-actinide"},
+  "Fm": {Z:100, name:"Fermio", mass:257.0, category:"Actínido", config:"[Rn] 5f¹² 7s²", categoryClass: "category-actinide"},
+  "Md": {Z:101, name:"Mendelevio", mass:258.0, category:"Actínido", config:"[Rn] 5f¹³ 7s²", categoryClass: "category-actinide"},
+  "No": {Z:102, name:"Nobelio", mass:259.0, category:"Actínido", config:"[Rn] 5f¹⁴ 7s²", categoryClass: "category-actinide"},
+  "Lr": {Z:103, name:"Laurencio", mass:262.0, category:"Actínido", config:"[Rn] 5f¹⁴ 7s² 7p¹", categoryClass: "category-actinide"},
+  "Rf": {Z:104, name:"Rutherfordio", mass:267.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d² 7s²", categoryClass: "category-transition-metal"},
+  "Db": {Z:105, name:"Dubnio", mass:268.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d³ 7s²", categoryClass: "category-transition-metal"},
+  "Sg": {Z:106, name:"Seaborgio", mass:269.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d⁴ 7s²", categoryClass: "category-transition-metal"},
+  "Bh": {Z:107, name:"Bohrio", mass:270.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d⁵ 7s²", categoryClass: "category-transition-metal"},
+  "Hs": {Z:108, name:"Hassio", mass:277.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d⁶ 7s²", categoryClass: "category-transition-metal"},
+  "Mt": {Z:109, name:"Meitnerio", mass:278.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d⁷ 7s²", categoryClass: "category-transition-metal"},
+  "Ds": {Z:110, name:"Darmstatio", mass:281.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d⁹ 7s¹", categoryClass: "category-transition-metal"},
+  "Rg": {Z:111, name:"Roentgenio", mass:282.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s¹", categoryClass: "category-transition-metal"},
+  "Cn": {Z:112, name:"Copernicio", mass:285.0, category:"Metal de transición", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s²", categoryClass: "category-transition-metal"},
+  "Nh": {Z:113, name:"Nihonio", mass:286.0, category:"Metal", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p¹", categoryClass: "category-metal"},
+  "Fl": {Z:114, name:"Flerovio", mass:289.0, category:"Metal", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p²", categoryClass: "category-metal"},
+  "Mc": {Z:115, name:"Moscovio", mass:290.0, category:"Metal", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p³", categoryClass: "category-metal"},
+  "Lv": {Z:116, name:"Livermorio", mass:293.0, category:"Metal", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁴", categoryClass: "category-metal"},
+  "Ts": {Z:117, name:"Teneso", mass:294.0, category:"Halógeno", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁵", categoryClass: "category-halogen"},
+  "Og": {Z:118, name:"Oganesón", mass:294.0, category:"Gas noble", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶", categoryClass: "category-noble-gas"}
 };
 
 const aufbauOrder = [
@@ -542,6 +611,8 @@ function displayDiagram(config) {
 // Función para mostrar información del elemento
 function displayElementInfo(symbol) {
   const element = elements[symbol];
+  const categorySpan = `<span class="element-category ${element.categoryClass}">${element.category}</span>`;
+  
   elementProperties.innerHTML = `
     <div class="property">
       <div class="property-name">Nombre</div>
@@ -561,7 +632,7 @@ function displayElementInfo(symbol) {
     </div>
     <div class="property">
       <div class="property-name">Categoría</div>
-      <div class="property-value">${element.category}</div>
+      <div class="property-value">${categorySpan}</div>
     </div>
     <div class="property">
       <div class="property-name">Configuración</div>
@@ -570,12 +641,60 @@ function displayElementInfo(symbol) {
   `;
 }
 
+// Función para convertir números a superíndices (solución mejorada)
+function toSuperscript(number) {
+  // Usar una solución más robusta para móviles
+  const superscriptMap = {
+    '0': '⁰',
+    '1': '¹',
+    '2': '²',
+    '3': '³',
+    '4': '⁴',
+    '5': '⁵',
+    '6': '⁶',
+    '7': '⁷',
+    '8': '⁸',
+    '9': '⁹'
+  };
+  
+  return number.toString().split('').map(digit => {
+    return superscriptMap[digit] || digit;
+  }).join('');
+}
+
+// Solución alternativa para navegadores móviles
+function createConfigHTML(config) {
+  let html = '<div class="config-text">';
+  
+  config.forEach(c => {
+    html += `${c.orbital}<span class="config-sup">${c.electrons}</span> `;
+  });
+  
+  html += '</div>';
+  return html;
+}
+
 // Event listeners
 elementSelect.addEventListener('change', () => {
   const el = elementSelect.value;
   if(el && elements[el]){
     const config = generateConfiguration(elements[el].Z);
-    configOutput.textContent = config.map(c => `${c.orbital}${c.electrons > 1 ? '⁰¹²³⁴⁵⁶⁷⁸⁹'[c.electrons] : c.electrons === 1 ? '¹' : '⁰'}`).join(' ');
+    
+    // Detectar si es un dispositivo móvil
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+      // Usar solución alternativa para móviles
+      configOutput.innerHTML = createConfigHTML(config);
+    } else {
+      // Usar superíndices Unicode para escritorio
+      const configText = config.map(c => {
+        return `${c.orbital}${toSuperscript(c.electrons)}`;
+      }).join(' ');
+      
+      configOutput.innerHTML = `<div class="config-text">${configText}</div>`;
+    }
+    
     displayDiagram(config);
     displayElementInfo(el);
     atomicNumberSlider.value = elements[el].Z;
