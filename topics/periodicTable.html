@@ -185,15 +185,20 @@
   
   .orbital-fill {
     height: 100%;
-    background: linear-gradient(to top, var(--primary), var(--primary-light));
     border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: bold;
     transition: width 1s ease;
   }
+  
+  .orbital-count {
+  display: block;
+  text-align: center;
+  margin-top: 6px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 0 3px rgba(0,0,0,0.5);
+  font-size: 1rem;
+}
+
   
   .element-details {
     margin-top: 25px;
@@ -389,7 +394,7 @@
           <span>Orbital vacío</span>
         </div>
         <div class="legend-item">
-          <div class="legend-color" style="background: linear-gradient(to top, #1a237e, #534bae);"></div>
+          <div class="legend-color" style="background: #8a2be2;"></div>
           <span>Orbital parcialmente lleno</span>
         </div>
         <div class="legend-item">
@@ -598,11 +603,28 @@ function displayDiagram(config) {
     
     const fillDiv = document.createElement('div');
     fillDiv.classList.add('orbital-fill');
-    fillDiv.style.width = `${(o.electrons/o.capacity)*100}%`;
-    fillDiv.textContent = `${o.electrons}/${o.capacity}`;
+
+    const percent = (o.electrons / o.capacity) * 100;
     
+    if (percent === 0) {
+      fillDiv.style.background = '#e0e0e0';            // vacío (gris claro)
+    }
+    else if (percent < 100) {
+      fillDiv.style.background = '#8a2be2'; // medio (violeta)
+    }
+    else {
+      fillDiv.style.background = '#1a237e'; // completo (morado)
+    }
+    
+    fillDiv.style.width = `${percent}%`;
     barContainer.appendChild(fillDiv);
     div.appendChild(barContainer);
+    
+    // Número de electrones debajo de la barra
+    const countDiv = document.createElement('div');
+    countDiv.classList.add('orbital-count');
+    countDiv.textContent = `${o.electrons}/${o.capacity}`;
+    div.appendChild(countDiv);
 
     diagram.appendChild(div);
   });
