@@ -443,6 +443,235 @@
 }
 </style>
 
+
+<!-- Agregar esta sección después del diagrama de orbitales -->
+<div class="panel" style="margin-top: 30px;">
+  <h2>Principio de Exclusión de Pauli y Regla de Hund</h2>
+  
+  <div class="small" style="margin-bottom: 15px;">
+    <p><strong>Principio de Exclusión de Pauli:</strong> Dos electrones en un mismo átomo no pueden tener los mismos cuatro números cuánticos.</p>
+    <p><strong>Regla de Hund:</strong> Los electrones deben ocupar todos los orbitales degenerados individualmente con spines paralelos antes de que ocurra el apareamiento.</p>
+  </div>
+  
+  <div class="orbital-box" style="background: #e8eaf6; padding: 15px; border-radius: 8px;">
+    <h3>Orbital P - Ejemplo interactivo</h3>
+    
+    <div class="orbital-p-container" style="display: flex; gap: 15px; justify-content: center; margin: 20px 0;">
+      <div class="orbital-p" data-orbital="px" style="width: 80px; text-align: center;">
+        <div class="orbital-label">px</div>
+        <div class="orbital-electrons" style="min-height: 80px; background: #c5cae9; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 5px; justify-content: center;">
+          <!-- Electrones aparecerán aquí -->
+        </div>
+        <button class="btn" style="margin-top: 10px; width: 100%;" onclick="addElectron('px')">+ Electrón</button>
+      </div>
+      
+      <div class="orbital-p" data-orbital="py" style="width: 80px; text-align: center;">
+        <div class="orbital-label">py</div>
+        <div class="orbital-electrons" style="min-height: 80px; background: #c5cae9; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 5px; justify-content: center;">
+          <!-- Electrones aparecerán aquí -->
+        </div>
+        <button class="btn" style="margin-top: 10px; width: 100%;" onclick="addElectron('py')">+ Electrón</button>
+      </div>
+      
+      <div class="orbital-p" data-orbital="pz" style="width: 80px; text-align: center;">
+        <div class="orbital-label">pz</div>
+        <div class="orbital-electrons" style="min-height: 80px; background: #c5cae9; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 5px; justify-content: center;">
+          <!-- Electrones aparecerán aquí -->
+        </div>
+        <button class="btn" style="margin-top: 10px; width: 100%;" onclick="addElectron('pz')">+ Electrón</button>
+      </div>
+    </div>
+    
+    <div style="text-align: center; margin: 15px 0;">
+      <button class="btn mutebtn" onclick="resetOrbitals()" style="margin-right: 10px;">Reiniciar</button>
+      <button class="btn" onclick="autoFillHund()">Llenado automático (Regla de Hund)</button>
+    </div>
+    
+    <div id="pauliFeedback" style="margin-top: 15px; padding: 10px; border-radius: 6px; background: #f5f5f5;"></div>
+  </div>
+  
+  <div class="explanation" style="margin-top: 20px;">
+    <h4>¿Qué está pasando aquí?</h4>
+    <ul class="small">
+      <li>Cada orbital p puede contener máximo 2 electrones con espines opuestos (Principio de Exclusión de Pauli)</li>
+      <li>La <strong>Regla de Hund</strong> establece que debes llenar todos los orbitales con 1 electrón (todos con spin ↑) antes de aparear electrones</li>
+      <li>Si intentas aparear electrones (agregar un segundo electrón con spin ↓) sin antes haber llenado todos los orbitales disponibles, estarás violando la Regla de Hund</li>
+    </ul>
+  </div>
+</div>
+
+<style>
+.electron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin: 0 auto;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.electron.up {
+  background: #ff5252; /* Rojo para spin arriba */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.electron.down {
+  background: #2196f3; /* Azul para spin abajo */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.hund-violation {
+  animation: shake 0.5s ease-in-out;
+  border: 2px solid #ff9800;
+  box-shadow: 0 0 8px #ff9800;
+}
+
+.pauli-violation {
+  animation: shake 0.5s ease-in-out;
+  border: 2px solid #f44336;
+  box-shadow: 0 0 8px #f44336;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.orbital-p {
+  transition: all 0.3s ease;
+}
+</style>
+
+<script>
+// Variables para el estado de los orbitales
+const orbitalState = {
+  px: [],
+  py: [],
+  pz: []
+};
+
+// Función para contar orbitales con un electrón
+function countSinglyOccupied() {
+  return [orbitalState.px, orbitalState.py, orbitalState.pz].filter(e => e.length === 1).length;
+}
+
+// Función para contar orbitales vacíos
+function countEmptyOrbitals() {
+  return [orbitalState.px, orbitalState.py, orbitalState.pz].filter(e => e.length === 0).length;
+}
+
+// Función para verificar si hay orbitales con un electrón que no tienen spin paralelo
+function hasNonParallelSpins() {
+  const spins = [];
+  if (orbitalState.px.length === 1) spins.push(orbitalState.px[0]);
+  if (orbitalState.py.length === 1) spins.push(orbitalState.py[0]);
+  if (orbitalState.pz.length === 1) spins.push(orbitalState.pz[0]);
+  
+  // Si hay más de un spin y no todos son iguales, hay spines no paralelos
+  return spins.length > 1 && !spins.every((val, i, arr) => val === arr[0]);
+}
+
+// Función para agregar un electrón a un orbital
+function addElectron(orbital) {
+  const electronsContainer = document.querySelector(`.orbital-p[data-orbital="${orbital}"] .orbital-electrons`);
+  const currentElectrons = orbitalState[orbital];
+  
+  // Verificar si ya hay 2 electrones (máximo permitido por Pauli)
+  if (currentElectrons.length >= 2) {
+    showFeedback("❌ ¡Violación del Principio de Exclusión de Pauli! No puedes agregar más de 2 electrones en un mismo orbital.", "error");
+    
+    // Efecto visual de violación Pauli
+    const orbitalEl = document.querySelector(`.orbital-p[data-orbital="${orbital}"]`);
+    orbitalEl.classList.add('pauli-violation');
+    setTimeout(() => orbitalEl.classList.remove('pauli-violation'), 1000);
+    
+    return;
+  }
+  
+  // Determinar el spin (primero siempre ↑, luego alternar)
+  let spin = 'up';
+  if (currentElectrons.length === 1) {
+    spin = currentElectrons[0] === 'up' ? 'down' : 'up';
+  }
+  
+  // VERIFICACIÓN DE LA REGLA DE HUND - ¡CORRECCIÓN IMPORTANTE!
+  // No se puede aparear (agregar segundo electrón) si hay orbitales vacíos
+  if (currentElectrons.length === 1 && countEmptyOrbitals() > 0) {
+    showFeedback("❌ ¡Violación de la Regla de Hund! No puedes aparear electrones cuando todavía hay orbitales vacíos. Llena todos los orbitales con un electrón primero.", "error");
+    
+      // Efecto visual de violación Hund
+    const orbitalEl = document.querySelector(`.orbital-p[data-orbital="${orbital}"]`);
+    orbitalEl.classList.add('hund-violation');
+    setTimeout(() => orbitalEl.classList.remove('hund-violation'), 1000);
+
+    return;
+  }
+
+  // Agregar electrón al estado
+  orbitalState[orbital].push(spin);
+
+  // Crear elemento visual del electrón
+  const electronEl = document.createElement('div');
+  electronEl.className = `electron ${spin}`;
+  electronEl.textContent = spin === 'up' ? '↑' : '↓';
+  electronEl.title = `Electrón con spin ${spin === 'up' ? '+1/2' : '-1/2'}`;
+  electronsContainer.appendChild(electronEl);
+
+  showFeedback(`✓ Electrón agregado al orbital ${orbital} con spin ${spin === 'up' ? '+½' : '-½'}`, "success");
+}
+
+// Función para llenado automático según Regla de Hund
+function autoFillHund() {
+  resetOrbitals();
+
+  const orbitals = ['px', 'py', 'pz'];
+  // Ejemplo con 3 electrones (puedes cambiar número según el nivel)
+  const totalElectrons = 3;
+
+  for (let i = 0; i < totalElectrons; i++) {
+    setTimeout(() => {
+      addElectron(orbitals[i]);
+    }, i * 300);
+  }
+
+  setTimeout(() => {
+    showFeedback("✓ Llenado automático completado según la Regla de Hund: máximo paralelismo de spines.", "success");
+  }, totalElectrons * 300 + 100);
+}
+
+// Función para reiniciar los orbitales
+function resetOrbitals() {
+  const orbitals = ['px', 'py', 'pz'];
+  orbitals.forEach(orbital => {
+    orbitalState[orbital] = [];
+    const container = document.querySelector(`.orbital-p[data-orbital="${orbital}"] .orbital-electrons`);
+    container.innerHTML = '';
+  });
+  showFeedback("Orbitales reiniciados. Puedes comenzar de nuevo.", "info");
+}
+
+// Función para mostrar feedback
+function showFeedback(message, type) {
+  const feedbackEl = document.getElementById('pauliFeedback');
+  feedbackEl.textContent = message;
+  feedbackEl.style.backgroundColor = type === 'error' ? '#ffebee' : 
+                                  type === 'success' ? '#e8f5e9' : '#e3f2fd';
+  feedbackEl.style.color = type === 'error' ? '#c62828' : 
+                           type === 'success' ? '#2e7d32' : '#1565c0';
+}
+
+// Inicializar mensaje al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+  showFeedback("Agrega electrones a los orbitales P para entender el Principio de Exclusión de Pauli y la Regla de Hund.", "info");
+});
+</script>
+
+
 <script>
 // Subcapa orden: s < p < d < f
 const orbitalOrder = ['1s','2s','2p','3s','3p','4s','3d','4p','5s','4d','5p','6s','4f','5d','6p','7s','5f','6d','7p'];
