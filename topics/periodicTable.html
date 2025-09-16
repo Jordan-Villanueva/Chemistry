@@ -671,69 +671,180 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-
 <script>
-// Subcapa orden: s < p < d < f
-const orbitalOrder = ['1s','2s','2p','3s','3p','4s','3d','4p','5s','4d','5p','6s','4f','5d','6p','7s','5f','6d','7p'];
+/* === Orden de llenado (Aufbau) === */
+const orbitalOrder = [
+  "1s","2s","2p","3s","3p","4s","3d","4p","5s","4d","5p",
+  "6s","4f","5d","6p","7s","5f","6d","7p"
+];
+const maxElectrones = { s:2, p:6, d:10, f:14 };
 
-// Configuración electrónica hasta Z=70 (Générica para cálculo aproximado)
+/* === Grupos (útiles para reglas de d/f) === */
+const groups = [
+  ['1s'],
+  ['2s','2p'],
+  ['3s','3p'],
+  ['3d'],
+  ['4s','4p'],
+  ['4d'],
+  ['4f'],
+  ['5s','5p'],
+  ['5d'],
+  ['5f'],
+  ['6s','6p'],
+  ['6d'],
+  ['7s','7p']
+];
+const groupMap = {};
+groups.forEach((g, idx) => g.forEach(orb => groupMap[orb] = idx));
+
+/* === Genera una configuración simple por Aufbau hasta Z electrons === */
 function generarConfiguracion(Z){
-  const config = [];
   let remaining = Z;
-  const maxElectrones = {s:2, p:6, d:10, f:14};
-  orbitalOrder.forEach(orb=>{
-    if(remaining<=0) return;
-    const tipo = orb[orb.length-1];
-    const n = parseInt(orb[0]);
-    const cant = Math.min(maxElectrones[tipo], remaining);
-    config.push({orb, tipo, n, e: cant});
-    remaining -= cant;
-  });
-  return config;
+  const cfg = [];
+  for(const orb of orbitalOrder){
+    if(remaining <= 0) break;
+    const tipo = orb.slice(-1); // 's','p','d','f'
+    const cap = maxElectrones[tipo] || 0;
+    const e = Math.min(cap, remaining);
+    cfg.push({ orb, tipo, e, n: parseInt(orb.match(/\d+/)[0], 10) });
+    remaining -= e;
+  }
+  return cfg;
 }
 
-function calcularSlater(){
-  const Z = parseInt(document.getElementById('atom').value);
-  const elecInput = document.getElementById('electron').value.trim().toLowerCase();
-  if(!Z || !elecInput) { 
-    document.getElementById('slaterFeedback').textContent="Ingresa Z y electrón."; 
-    return; 
-  }
+/* === Parsear entrada tipo '3p' (acepta espacios) === */
+function parseTarget(input){
+  const m = input.trim().toLowerCase().match(/^(\d{1,2})\s*([spdf])$/);
+  if(!m) return null;
+  return { n: parseInt(m[1],10), type: m[2], orb: `${m[1]}${m[2]}` };
+}
 
-  const n = parseInt(elecInput[0]);
-  const tipo = elecInput[1];
-  const config = generarConfiguracion(Z);
+/* === Función principal: calcular Slater (llamada desde el botón) === */
+function calcularSlater() {
+  const Zraw = document.getElementById('atom').value;
+  const elecRaw = document.getElementById('electron').value;
+  const out = document.getElementById('slaterFeedback');
 
-  // Buscar el electrón objetivo en la configuración
-  let targetIndex = -1;
-  for(let i=0;i<config.length;i++){
-    if(config[i].orb.toLowerCase()===elecInput){targetIndex=i; break;}
-  }
-  if(targetIndex===-1){
-    document.getElementById('slaterFeedback').textContent="Electrón no encontrado en la configuración.";
+  const Z = parseInt(Zraw, 10);
+  if(isNaN(Z) || Z < 1) { out.innerHTML = 'Introduce un Z válido (entero ≥ 1).'; return; }
+  const target = parseTarget(elecRaw);
+  if(!target){ out.innerHTML = 'Introduce el electrón objetivo en formato: 2p, 3s, 4d, etc.'; return; }
+
+  const cfg = generarConfiguracion(Z);
+
+  // buscar el orbital objetivo en la configuración generada
+  const targetEntry = cfg.find(c => c.orb.toLowerCase() === target.orb.toLowerCase());
+  if(!targetEntry){
+    out.innerHTML = `<div>El orbital <strong>${target.orb}</strong> no aparece en la configuración para Z=${Z}.<br>
+      Configuración generada: <code>${cfg.map(c=>c.orb + (c.e?c.e:'0')).join(' ')}</code></div>`;
     return;
   }
 
-  // Calcular apantallamiento (S)
+  const isSP = (target.type === 's' || target.type === 'p');
+  const isDF = (target.type === 'd' || target.type === 'f');
+
   let S = 0;
-  for(let i=0;i<config.length;i++){
-    const c = config[i];
-    if(i===targetIndex){
-      S += (c.e-1)*0.35; // misma subcapa
-    } else if(c.n === n){
-      // mismo nivel, distinta subcapa: no apantalla para s/p/d/f (aprox)
-      if(c.tipo === tipo) continue;
-    } else if(c.n === n-1){
-      // nivel anterior
-      if(c.tipo==='s'||c.tipo==='p') S += c.e*0.85;
-      else S += c.e*1.00; // d/f
-    } else if(c.n <= n-2){
-      S += c.e*1.00;
+  const detalles = [];
+
+  // Recorremos todos los orbitales y calculamos su contribución
+  cfg.forEach(entry => {
+    if(entry.e === 0) return;
+
+    // número de electrones que efectivamente contribuyen (si es el orbital objetivo, restamos 1)
+    let contributing = entry.e;
+    if(entry.orb.toLowerCase() === targetEntry.orb.toLowerCase()) contributing = Math.max(0, entry.e - 1);
+    if(contributing === 0) return;
+
+    let per = 0;
+    let regla = '';
+
+    if(isSP){
+      // Reglas clásicas para s/p:
+      if(entry.n > target.n){
+        per = 0; regla = `orbital externo (n=${entry.n}) → 0`;
+      } else if(entry.n === target.n){
+        // mismo nivel n (incluye 3s para 3p)
+        per = (target.n === 1) ? 0.30 : 0.35;
+        regla = `mismo nivel n=${target.n} → ${per}`;
+      } else if(entry.n === target.n - 1){
+        per = 0.85; regla = `nivel n-1 (n=${entry.n}) → 0.85`;
+      } else if(entry.n <= target.n - 2){
+        per = 1.00; regla = `niveles ≤ n-2 (n=${entry.n}) → 1.00`;
+      }
+    } else if(isDF){
+      // Reglas para d/f:
+      const grpEntry = (typeof groupMap[entry.orb] !== 'undefined') ? groupMap[entry.orb] : null;
+      const grpTarget = (typeof groupMap[targetEntry.orb] !== 'undefined') ? groupMap[targetEntry.orb] : null;
+      if(grpEntry === null || grpTarget === null){
+        // fallback por n:
+        if(entry.n >= target.n) { per = 0; regla = 'orbital externo o mismo n (fallback) → 0'; }
+        else { per = 1.00; regla = 'capa interna (fallback) → 1.00'; }
+      } else {
+        if(grpEntry > grpTarget) { per = 0; regla = 'grupo más externo → 0'; }
+        else if(grpEntry === grpTarget) { per = 0.35; regla = 'mismo grupo d/f → 0.35'; }
+        else { per = 1.00; regla = 'grupo interno → 1.00'; }
+      }
+    } else {
+      per = 0; regla = 'tipo no soportado';
     }
+
+    const contrib = +(contributing * per);
+    if(contrib > 0){
+      S += contrib;
+      detalles.push({
+        orb: entry.orb,
+        contributing,
+        per,
+        contrib,
+        regla
+      });
+    }
+  });
+
+  const Zef = +(Z - S);
+  // Construir HTML de salida con desglose
+  let html = `<div><strong>Configuración (Aufbau) para Z=${Z}:</strong><br><code>${cfg.map(c=>`${c.orb}${c.e}`).join(' ')}</code></div>`;
+  html += `<div style="margin-top:8px"><strong>Objetivo:</strong> ${target.orb} (n=${target.n}, tipo=${target.type})</div>`;
+
+  html += `<table style="width:100%; margin-top:8px; border-collapse:collapse; font-size:0.95rem;">
+    <thead>
+      <tr style="text-align:left; border-bottom:1px solid #ddd;">
+        <th style="padding:6px">Orbital</th>
+        <th style="padding:6px">e contribuyendo</th>
+        <th style="padding:6px">Regla aplicada</th>
+        <th style="padding:6px">Per e⁻</th>
+        <th style="padding:6px">Contribución</th>
+      </tr>
+    </thead>
+    <tbody>`;
+  detalles.forEach(d=>{
+    html += `<tr style="border-bottom:1px dashed #f0f0f0;">
+      <td style="padding:6px">${d.orb}</td>
+      <td style="padding:6px">${d.contributing}</td>
+      <td style="padding:6px">${d.regla}</td>
+      <td style="padding:6px">${d.per.toFixed(2)}</td>
+      <td style="padding:6px">${d.contrib.toFixed(2)}</td>
+    </tr>`;
+  });
+  html += `</tbody></table>`;
+
+  html += `<div style="margin-top:8px"><strong>S (total) =</strong> ${S.toFixed(2)}</div>`;
+  html += `<div style="margin-top:6px"><strong>Zₑₓₑᶠ = Z - S =</strong> ${Z} - ${S.toFixed(2)} = <strong>${Zef.toFixed(2)}</strong></div>`;
+
+  // Mensaje de comprobación rápida (ejemplo clásico)
+  if(Z === 20 && target.orb.toLowerCase() === '3p') {
+    html += `<div style="margin-top:6px;color:#333;font-style:italic">Comprobación: Ca (Z=20) 3p → S esperado = 11.25, Zₑₓₑᶠ = 8.75</div>`;
   }
 
-  const Zef = (Z - S).toFixed(2);
-  document.getElementById('slaterFeedback').innerHTML = `La carga nuclear efectiva Z<sub>ef</sub> para ${elecInput} es ≈ ${Zef}`;
+  out.innerHTML = html;
+}
+
+/* === Opcional: función helper para probar casos conocidos desde consola === */
+function slaterTest(Z, targetOrbStr){
+  document.getElementById('atom').value = Z;
+  document.getElementById('electron').value = targetOrbStr;
+  calcularSlater();
 }
 </script>
 
