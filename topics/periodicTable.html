@@ -410,39 +410,43 @@
   <h2>Reglas de Slater - Cálculo Interactivo de Z<sub>ef</sub></h2>
   
   <div class="small" style="margin-bottom: 15px;">
-    <p><strong>Las Reglas de Slater</strong> permiten estimar la carga nuclear efectiva (Z<sub>ef</sub>) que experimenta un electrón en un átomo:</p>
-    <ul>
-      <li><strong>Electrones en la misma subcapa:</strong> 0.35</li>
-      <li><strong>Electrones en s/p de nivel n-1:</strong> 0.85</li>
-      <li><strong>Electrones en s/p de niveles inferiores (n-2 o más):</strong> 1.00</li>
-      <li><strong>Electrones en d/f de niveles más internos:</strong> 1.00</li>
-    </ul>
-    <p>Más detalles en <a href="https://chem.libretexts.org/Courses/Mount_Royal_University/Chem_1201/Unit_2._Periodic_Properties_of_the_Elements/2.06%3A_Slater%27s_Rules" target="_blank">LibreTexts</a>.</p>
+    <p><strong>Las Reglas de Slater</strong> permiten estimar la carga nuclear efectiva (Z<sub>ef</sub>) que experimenta un electrón, teniendo en cuenta el apantallamiento de los demás electrones. Esta herramienta aplica las reglas estándar (agrupamientos y factores 0.35, 0.30, 0.85 y 1.00) y muestra el cálculo detallado paso a paso.</p>
+    <p>Fuente y reglas aplicadas: LibreTexts (Slater's Rules). </p>
   </div>
   
   <div class="orbital-box" style="background: #f3e5f5; padding: 15px; border-radius: 8px;">
     <h3>Calculadora Interactiva de Z<sub>ef</sub></h3>
     
-    <div style="margin: 10px 0;">
+    <div style="margin: 10px 0; display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
       <label for="atom">Número atómico (Z): </label>
-      <input type="number" id="atom" min="1" max="70" value="8" style="width:100px; margin-right: 20px;">
+      <input type="number" id="atom" min="1" max="118" value="20" style="width:100px; padding:6px 8px; margin-right: 10px;">
       
-      <label for="electron">Electrón (ej: 2p, 3s, 3d, 4f): </label>
-      <input type="text" id="electron" placeholder="2p" style="width:60px;">
+      <label for="electron">Electrón (ej: 2p, 3s, 4d): </label>
+      <input type="text" id="electron" placeholder="3p" style="width:90px; padding:6px 8px;">
       
-      <button class="btn" onclick="calcularSlater()" style="margin-left: 10px;">Calcular Z<sub>ef</sub></button>
+      <button class="btn" onclick="calcularSlater()" style="margin-left: 6px;">Calcular Z<sub>ef</sub></button>
+      <button class="btn mutebtn" onclick="clearSlater()" style="margin-left:6px;">Limpiar</button>
     </div>
     
-    <div id="slaterFeedback" style="margin-top: 15px; padding: 10px; border-radius: 6px; background: #f5f5f5;"></div>
+    <div id="slaterFeedback" style="margin-top: 15px; padding: 12px; border-radius: 6px; background: #fff; font-family: monospace;"></div>
+  </div>
+  
+  <div class="explanation" style="margin-top: 20px;">
+    <h4>Notas rápidas</h4>
+    <ul class="small">
+      <li>Introduce Z (1–118) y la subcapa objetivo en formato <code>nℓ</code> (ej. <code>3p</code>, <code>4d</code>).</li>
+      <li>El resultado muestra la configuración electrónica usada (orden Aufbau), los grupos considerados y el aporte de cada uno a S.</li>
+    </ul>
   </div>
 </div>
 
 <style>
-#slaterFeedback {
-  font-weight: bold;
-}
+  /* Estilos mín. para la tabla de salida */
+  #slaterFeedback table { width:100%; border-collapse: collapse; margin-top:8px; }
+  #slaterFeedback th, #slaterFeedback td { border: 1px solid #eee; padding:6px 8px; text-align:left; font-size:0.95rem; }
+  #slaterFeedback th { background:#faf1ff; }
+  #slaterFeedback .muted { color:#666; font-size:0.9rem; }
 </style>
-
 
 <!-- Agregar esta sección después del diagrama de orbitales -->
 <div class="panel" style="margin-top: 30px;">
@@ -672,116 +676,139 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script>
-/* === Orden de llenado (Aufbau) === */
+// Orden de orbitales por configuración
 const orbitalOrder = ['1s','2s','2p','3s','3p','4s','3d','4p','5s','4d','5p','6s','4f','5d','6p','7s','5f','6d','7p'];
+
+// Máximo de electrones por subcapa
 const maxElectrones = {s:2, p:6, d:10, f:14};
 
+// Genera configuración electrónica
 function generarConfiguracion(Z){
-  const config = [];
   let remaining = Z;
-  for (const orb of orbitalOrder) {
-    if (remaining <= 0) break;
-    const tipo = orb.slice(-1);
+  const config = [];
+  orbitalOrder.forEach(orb => {
+    if(remaining <= 0) return;
+    const tipo = orb[orb.length-1];
     const n = parseInt(orb[0]);
     const cant = Math.min(maxElectrones[tipo], remaining);
     config.push({orb, n, tipo, e: cant});
     remaining -= cant;
-  }
+  });
   return config;
 }
 
-function agruparPorNivel(config){
-  const grupos = {};
-  for(const c of config){
-    let grupoTipo = (c.tipo==='s'||c.tipo==='p') ? 'sp' : c.tipo; 
-    if(!grupos[c.n]) grupos[c.n] = {sp:0, d:0, f:0};
-    grupos[c.n][grupoTipo] += c.e;
-  }
+// Agrupa orbitales por nivel y bloque para aplicar Slater
+function agruparOrbitales(config){
+  const grupos = [];
+  let nivelActual = config[0].n;
+  let bloque = [];
+  
+  config.forEach(c => {
+    if(c.n !== nivelActual || (bloque.length>0 && ((bloque[0].tipo==='s'||bloque[0].tipo==='p') && (c.tipo==='d'||c.tipo==='f')))){
+      grupos.push([...bloque]);
+      bloque = [];
+      nivelActual = c.n;
+    }
+    bloque.push(c);
+  });
+  if(bloque.length>0) grupos.push([...bloque]);
   return grupos;
 }
 
+// Función principal para calcular Slater
 function calcularSlater(){
   const Z = parseInt(document.getElementById('atom').value);
   const elecInput = document.getElementById('electron').value.trim().toLowerCase();
-  const output = document.getElementById('slaterFeedback');
-  
+  const feedback = document.getElementById('slaterFeedback');
+  feedback.innerHTML = "";
+
   if(!Z || !elecInput) { 
-    output.textContent="Ingresa Z y electrón."; 
+    feedback.textContent="Ingresa Z y electrón."; 
     return; 
   }
 
-  const n = parseInt(elecInput[0]);
-  const tipo = elecInput[1];
-  const grupoTipo = (tipo==='s'||tipo==='p')?'sp':tipo;
-
+  const nObj = parseInt(elecInput[0]);
+  const tipoObj = elecInput[1];
+  
   const config = generarConfiguracion(Z);
-  const grupos = agruparPorNivel(config);
+  const grupos = agruparOrbitales(config);
 
-  if(!grupos[n] || grupos[n][grupoTipo]===0){
-    output.textContent="Electrón no encontrado en la configuración.";
+  // Buscar el orbital objetivo
+  let targetOrb = null;
+  for(const g of grupos){
+    for(const c of g){
+      if(c.orb.toLowerCase()===elecInput){
+        targetOrb = c;
+        break;
+      }
+    }
+    if(targetOrb) break;
+  }
+  if(!targetOrb){
+    feedback.textContent="Electrón no encontrado en la configuración.";
     return;
   }
 
   let S = 0;
-  let pasos = [];
+  let detalle = "<b>Desglose de Slater:</b><br><ul>";
 
-  if(grupoTipo==='sp'){
-    // mismo nivel sp
-    const mismos = grupos[n].sp - 1;
-    if(mismos>0){
-      S += mismos * 0.35;
-      pasos.push(`${mismos} electrones en el mismo nivel (ns/np) → ×0.35 = ${(mismos*0.35).toFixed(2)}`);
-    }
-    // nivel n-1
-    if(grupos[n-1]){
-      const cant = grupos[n-1].sp+grupos[n-1].d+grupos[n-1].f;
-      if(cant>0){
-        S += cant * 0.85;
-        pasos.push(`${cant} electrones en el nivel ${n-1} → ×0.85 = ${(cant*0.85).toFixed(2)}`);
-      }
-    }
-    // niveles ≤ n-2
-    for(let i=n-2;i>=1;i--){
-      if(grupos[i]){
-        const cant = grupos[i].sp+grupos[i].d+grupos[i].f;
-        if(cant>0){
-          S += cant * 1.00;
-          pasos.push(`${cant} electrones en el nivel ${i} → ×1.00 = ${(cant*1.00).toFixed(2)}`);
+  for(const g of grupos){
+    // Ignorar grupos con n > nObj
+    const nGrupo = g[0].n;
+    if(nGrupo > nObj) continue;
+
+    let eGrupo = 0;
+    let factor = 1;
+
+    // Mismo nivel
+    if(nGrupo === nObj){
+      g.forEach(c => {
+        if(c.orb === targetOrb.orb){
+          // Mismo orbital
+          if(c.e>1) eGrupo += c.e - 1; // excluye electrón observado
+          factor = 0.35;
+        } else if((c.tipo==='s'||c.tipo==='p') && (tipoObj==='s'||tipoObj==='p')){
+          eGrupo += c.e; // otros s/p del mismo nivel
+          factor = 0.35;
+        } else if((c.tipo==='d'||c.tipo==='f') && (tipoObj==='s'||tipoObj==='p')){
+          eGrupo += c.e; // d/f del mismo nivel para s/p
+          factor = 0.85;
+        } else if(tipoObj==='d' && c.tipo==='d'){
+          if(c.orb === targetOrb.orb) eGrupo += c.e - 1;
+          else eGrupo += c.e;
+          factor = 0.35;
+        } else if(tipoObj==='d' && (c.tipo==='s'||c.tipo==='p')){
+          eGrupo += c.e; // s/p de nivel anterior n-1 para d
+          factor = 1.00;
+        } else if(tipoObj==='f' && c.tipo==='f'){
+          if(c.orb === targetOrb.orb) eGrupo += c.e -1;
+          else eGrupo += c.e;
+          factor = 0.35;
+        } else {
+          eGrupo += c.e;
+          factor = 1.00;
         }
-      }
+      });
+    } else if(nGrupo === nObj -1){
+      // nivel anterior
+      g.forEach(c=> eGrupo += c.e);
+      factor = (tipoObj==='s'||tipoObj==='p') ? 0.85 : 1.00;
+    } else if(nGrupo <= nObj-2){
+      // niveles inferiores
+      g.forEach(c=> eGrupo += c.e);
+      factor = 1.00;
     }
-  } else {
-    // grupo d o f
-    const mismos = grupos[n][grupoTipo] - 1;
-    if(mismos>0){
-      S += mismos * 0.35;
-      pasos.push(`${mismos} electrones en el mismo subnivel (${grupoTipo}) → ×0.35 = ${(mismos*0.35).toFixed(2)}`);
-    }
-    // todos niveles inferiores
-    for(let i=n-1;i>=1;i--){
-      if(grupos[i]){
-        const cant = grupos[i].sp+grupos[i].d+grupos[i].f;
-        if(cant>0){
-          S += cant * 1.00;
-          pasos.push(`${cant} electrones en el nivel ${i} → ×1.00 = ${(cant*1.00).toFixed(2)}`);
-        }
-      }
-    }
+
+    const contrib = eGrupo*factor;
+    S += contrib;
+    detalle += `<li>${g.map(x=>x.orb+"("+x.e+")").join(" ")}: ${eGrupo}·${factor} = ${contrib.toFixed(2)}</li>`;
   }
 
   const Zef = (Z - S).toFixed(2);
-
-  output.innerHTML = `
-    <b>Desglose de S:</b><br>
-    ${pasos.join('<br>')}
-    <br><br><b>S = ${S.toFixed(2)}</b>
-    <br><b>Z<sub>ef</sub> = ${Z} - ${S.toFixed(2)} = ${Zef}</b>
-  `;
+  detalle += `</ul><b>Z<sub>ef</sub> ≈ ${Zef}</b>`;
+  feedback.innerHTML = detalle;
 }
-
 </script>
-
-
 
 <script>
 // Base de datos completa con los 118 elementos
