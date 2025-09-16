@@ -424,11 +424,13 @@
       <label for="electron">Electrón (ej: 2p, 3s, 4d): </label>
       <input type="text" id="electron" placeholder="3p" style="width:90px; padding:6px 8px;">
       
-      <button class="btn" onclick="calcularSlater()" style="margin-left: 6px;">Calcular Z<sub>ef</sub></button>
+      <button class="btn" onclick="runSlaterUI()" style="margin-left: 6px;">Calcular Z<sub>eff</sub></button>
+      <button class="btn mutebtn" onclick="runExamples()">Mostrar ejemplos (Ca, Sn, Pb)</button>
       <button class="btn mutebtn" onclick="clearSlater()" style="margin-left:6px;">Limpiar</button>
     </div>
     
     <div id="slaterFeedback" style="margin-top: 15px; padding: 12px; border-radius: 6px; background: #fff; font-family: monospace;"></div>
+      <div id="slaterResults" style="margin-top:12px;"></div>
   </div>
   
   <div class="explanation" style="margin-top: 20px;">
@@ -453,7 +455,7 @@
   <h2>Principio de Exclusión de Pauli y Regla de Hund</h2>
   
   <div class="small" style="margin-bottom: 15px;">
-    <p><strong>Principio de Exclusión de Pauli:</strong> Dos electrones en un mismo átomo no pueden tener los mismos cuatro números cuánticos.</p>
+    <p><strong>Principio de Exclusión de Pauli:</strong> Dos electrones en un mismo átomo no pueden tener los mismos cuatro números cuánticos.</p>18
     <p><strong>Regla de Hund:</strong> Los electrones deben ocupar todos los orbitales degenerados individualmente con spines paralelos antes de que ocurra el apareamiento.</p>
   </div>
   
@@ -676,139 +678,220 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script>
-// Orden de orbitales por configuración
-const orbitalOrder = ['1s','2s','2p','3s','3p','4s','3d','4p','5s','4d','5p','6s','4f','5d','6p','7s','5f','6d','7p'];
+/* ---------- Orden de energía (Aufbau) usado para construir la configuración ---------- */
+const orbitalOrder = [
+  '1s','2s','2p','3s','3p','4s','3d','4p','5s','4d','5p',
+  '6s','4f','5d','6p','7s','5f','6d','7p'
+];
+const capacity = { s:2, p:6, d:10, f:14 };
 
-// Máximo de electrones por subcapa
-const maxElectrones = {s:2, p:6, d:10, f:14};
-
-// Genera configuración electrónica
+/* Genera configuración en el orden Aufbau, cada entrada tiene idx (posición en orbitalOrder) */
 function generarConfiguracion(Z){
   let remaining = Z;
   const config = [];
-  orbitalOrder.forEach(orb => {
+  orbitalOrder.forEach((orb, idx) => {
     if(remaining <= 0) return;
-    const tipo = orb[orb.length-1];
-    const n = parseInt(orb[0]);
-    const cant = Math.min(maxElectrones[tipo], remaining);
-    config.push({orb, n, tipo, e: cant});
-    remaining -= cant;
+    const m = orb.match(/^(\d+)([spdf])$/i);
+    if(!m) return;
+    const n = parseInt(m[1], 10);
+    const tipo = m[2].toLowerCase();
+    const take = Math.min(remaining, capacity[tipo] || 0);
+    if(take > 0) config.push({ orb, n, tipo, e: take, idx });
+    remaining -= take;
   });
   return config;
 }
 
-// Agrupa orbitales por nivel y bloque para aplicar Slater
-function agruparOrbitales(config){
-  const grupos = [];
-  let nivelActual = config[0].n;
-  let bloque = [];
-  
-  config.forEach(c => {
-    if(c.n !== nivelActual || (bloque.length>0 && ((bloque[0].tipo==='s'||bloque[0].tipo==='p') && (c.tipo==='d'||c.tipo==='f')))){
-      grupos.push([...bloque]);
-      bloque = [];
-      nivelActual = c.n;
-    }
-    bloque.push(c);
+/* Devuelve HTML mostrando el orden de energía y marcando el orbital objetivo */
+function formatoOrdenEnergiaHTML(targetOrb) {
+  const parts = orbitalOrder.map(o => {
+    if(o.toLowerCase() === targetOrb.toLowerCase()) return `<strong style="color:#ffffff;background:#2b7a78;padding:2px 6px;border-radius:6px">${o}</strong>`;
+    return `<span style="opacity:0.85">${o}</span>`;
   });
-  if(bloque.length>0) grupos.push([...bloque]);
-  return grupos;
+  return `<div style="margin-bottom:8px"><strong>Orden de energía (Aufbau) mostrado:</strong><div style="margin-top:6px;line-height:1.6">${parts.join(' → ')}</div></div>`;
 }
 
-// Función principal para calcular Slater
-function calcularSlater(){
-  const Z = parseInt(document.getElementById('atom').value);
-  const elecInput = document.getElementById('electron').value.trim().toLowerCase();
-  const feedback = document.getElementById('slaterFeedback');
-  feedback.innerHTML = "";
+/* Calcula Slater devolviendo desglose por orbital (solo considera orbitales a la izquierda del objetivo) */
+function calcularSlaterDetalle(Z, elecRaw) {
+  const elec = (elecRaw||'').trim().toLowerCase();
+  const m = elec.match(/^(\d+)([spdf])$/i);
+  if(!m) return { error: 'Formato inválido. Use, por ejemplo: 3p, 4d, 6s' };
 
-  if(!Z || !elecInput) { 
-    feedback.textContent="Ingresa Z y electrón."; 
-    return; 
-  }
+  const nObj = parseInt(m[1], 10);
+  const tipoObj = m[2].toLowerCase();
 
-  const nObj = parseInt(elecInput[0]);
-  const tipoObj = elecInput[1];
-  
+  // generar configuración
   const config = generarConfiguracion(Z);
-  const grupos = agruparOrbitales(config);
 
-  // Buscar el orbital objetivo
-  let targetOrb = null;
-  for(const g of grupos){
-    for(const c of g){
-      if(c.orb.toLowerCase()===elecInput){
-        targetOrb = c;
-        break;
-      }
-    }
-    if(targetOrb) break;
-  }
-  if(!targetOrb){
-    feedback.textContent="Electrón no encontrado en la configuración.";
-    return;
-  }
+  // encontrar entrada objetivo (por orb exacto)
+  const targetEntry = config.find(c => c.orb.toLowerCase() === elec);
+  if(!targetEntry) return { error: `El orbital ${elec} no aparece en la configuración para Z=${Z}.` };
+
+  // índice en el orden Aufbau: consideramos sólo orbitals con idx <= targetIdx (izquierda incluyendo objetivo)
+  const targetIdx = targetEntry.idx;
+  const leftOrbitals = config.filter(c => c.idx <= targetIdx);
 
   let S = 0;
-  let detalle = "<b>Desglose de Slater:</b><br><ul>";
+  const detalle = [];
 
-  for(const g of grupos){
-    // Ignorar grupos con n > nObj
-    const nGrupo = g[0].n;
-    if(nGrupo > nObj) continue;
+  // recorrer orbitales 'izquierda' y calcular factor y contribución
+  leftOrbitals.forEach(c => {
+    let factor = 0;
+    let counted = 0;
 
-    let eGrupo = 0;
-    let factor = 1;
-
-    // Mismo nivel
-    if(nGrupo === nObj){
-      g.forEach(c => {
-        if(c.orb === targetOrb.orb){
-          // Mismo orbital
-          if(c.e>1) eGrupo += c.e - 1; // excluye electrón observado
-          factor = 0.35;
-        } else if((c.tipo==='s'||c.tipo==='p') && (tipoObj==='s'||tipoObj==='p')){
-          eGrupo += c.e; // otros s/p del mismo nivel
-          factor = 0.35;
-        } else if((c.tipo==='d'||c.tipo==='f') && (tipoObj==='s'||tipoObj==='p')){
-          eGrupo += c.e; // d/f del mismo nivel para s/p
-          factor = 0.85;
-        } else if(tipoObj==='d' && c.tipo==='d'){
-          if(c.orb === targetOrb.orb) eGrupo += c.e - 1;
-          else eGrupo += c.e;
-          factor = 0.35;
-        } else if(tipoObj==='d' && (c.tipo==='s'||c.tipo==='p')){
-          eGrupo += c.e; // s/p de nivel anterior n-1 para d
+    // si el objetivo es s/p
+    if(tipoObj === 's' || tipoObj === 'p') {
+      if(c.n === nObj && (c.tipo === 's' || c.tipo === 'p')) {
+        // mismos s/p en mismo n → 0.35 (excluir 1 electrón: el observado)
+        factor = (nObj === 1) ? 0.30 : 0.35; // excepción 1s -> 0.30
+        counted = c.e - (c.orb.toLowerCase() === elec ? 1 : 0);
+      } else if(c.n === nObj - 1) {
+        // capa n-1 → 0.85 (incluye d/f si existen con n-1)
+        factor = 0.85;
+        counted = c.e;
+      } else if(c.n <= nObj - 2) {
+        factor = 1.00;
+        counted = c.e;
+      } else {
+        // (por seguridad) si está en el mismo n pero no s/p (ej: d en mismo n y aparece a la izquierda),
+        // para s/p objetivo esos d pertenecen a n (si n===nObj) pero NO cuentan como "mismo grupo s/p"; 
+        // si n === nObj y tipo != s/p, no los sumamos en "mismo s/p" (quedan ignorados aquí).
+        factor = 0;
+        counted = 0;
+      }
+    } else {
+      // objetivo d/f
+      if(c.n === nObj && (c.tipo === 'd' || c.tipo === 'f')) {
+        // mismos d/f en mismo n → 0.35 (excluir 1)
+        factor = 0.35;
+        counted = c.e - (c.orb.toLowerCase() === elec ? 1 : 0);
+      } else if(c.idx < targetIdx || (c.idx === targetIdx && c.orb.toLowerCase() !== elec)) {
+        // cualquier orbital en capas internas (n < nObj) o acomp. previos → 1.00
+        // (para d/f: n-1 y menores son 1.00)
+        if(c.n < nObj) {
           factor = 1.00;
-        } else if(tipoObj==='f' && c.tipo==='f'){
-          if(c.orb === targetOrb.orb) eGrupo += c.e -1;
-          else eGrupo += c.e;
-          factor = 0.35;
+          counted = c.e;
         } else {
-          eGrupo += c.e;
-          factor = 1.00;
+          // mismo n pero tipo distinto (p.ej 4s/4p) y está a la izquierda: para d objetivo cuentan como 1.00
+          if(c.n === nObj) { factor = 1.00; counted = c.e; }
         }
-      });
-    } else if(nGrupo === nObj -1){
-      // nivel anterior
-      g.forEach(c=> eGrupo += c.e);
-      factor = (tipoObj==='s'||tipoObj==='p') ? 0.85 : 1.00;
-    } else if(nGrupo <= nObj-2){
-      // niveles inferiores
-      g.forEach(c=> eGrupo += c.e);
-      factor = 1.00;
+      } else {
+        factor = 0;
+        counted = 0;
+      }
     }
 
-    const contrib = eGrupo*factor;
-    S += contrib;
-    detalle += `<li>${g.map(x=>x.orb+"("+x.e+")").join(" ")}: ${eGrupo}·${factor} = ${contrib.toFixed(2)}</li>`;
-  }
+    const contrib = Number((counted * factor).toFixed(4));
+    if(counted > 0 && factor > 0) {
+      detalle.push({
+        orb: c.orb, n: c.n, tipo: c.tipo, total: c.e, counted, factor, contrib
+      });
+      S += contrib;
+    }
+  });
 
-  const Zef = (Z - S).toFixed(2);
-  detalle += `</ul><b>Z<sub>ef</sub> ≈ ${Zef}</b>`;
-  feedback.innerHTML = detalle;
+  S = Number(S.toFixed(4));
+  const Zef = Number((Z - S).toFixed(4));
+  return { Z, elec, nObj, tipoObj, S, Zef, detalle, config, targetOrb: targetEntry.orb };
 }
+
+/* ---------- UI: tabla limpia y orden de energía ---------- */
+function formaTablaResultado(res){
+  if(res.error) return `<div style="color:#b71c1c"><strong>Error:</strong> ${res.error}</div>`;
+
+  // orden de energía con resaltado
+  let html = formatoOrdenEnergiaHTML(res.elec);
+
+  html += `<div style="margin-bottom:8px"><strong>Resumen:</strong> Z=${res.Z}, objetivo <strong>${res.elec}</strong> → S = <strong>${res.S.toFixed(4)}</strong>, Z_eff ≈ <strong>${res.Zef.toFixed(4)}</strong></div>`;
+
+  // tabla por orbital (solo los que sumaron)
+  html += `<table style="width:100%;border-collapse:collapse;font-family:monospace">
+    <thead>
+      <tr style="background:#f3f3f3">
+        <th style="text-align:left;padding:8px;border:1px solid #eee">Orbital</th>
+        <th style="text-align:right;padding:8px;border:1px solid #eee">Electrones</th>
+        <th style="text-align:right;padding:8px;border:1px solid #eee">Contados</th>
+        <th style="text-align:right;padding:8px;border:1px solid #eee">Factor</th>
+        <th style="text-align:right;padding:8px;border:1px solid #eee">Contribución</th>
+      </tr>
+    </thead><tbody>`;
+
+  res.detalle.forEach(r => {
+    html += `<tr>
+      <td style="padding:6px;border:1px solid #eee">${r.orb}</td>
+      <td style="padding:6px;border:1px solid #eee;text-align:right">${r.total}</td>
+      <td style="padding:6px;border:1px solid #eee;text-align:right">${r.counted}</td>
+      <td style="padding:6px;border:1px solid #eee;text-align:right">${r.factor.toFixed(2)}</td>
+      <td style="padding:6px;border:1px solid #eee;text-align:right">${r.contrib.toFixed(2)}</td>
+    </tr>`;
+  });
+
+  html += `</tbody></table>`;
+
+  // Mostrar configuración generada (agrupada por n para legibilidad)
+  const grouped = {};
+  res.config.forEach(c => {
+    if(!grouped[c.n]) grouped[c.n] = [];
+    grouped[c.n].push(`${c.orb}${c.e}`);
+  });
+  const groupingHtml = Object.keys(grouped).sort((a,b)=>a-b).map(n=> `(${ grouped[n].join(' ') })`).join(' ');
+
+  html += `<div style="margin-top:8px;color:#555"><strong>Configuración (Aufbau usado):</strong> ${groupingHtml}</div>`;
+
+  return html;
+}
+
+/* ---------- funciones de integración con tu HTML ---------- */
+function runSlaterUI(){
+  const Z = Number(document.getElementById('atom').value);
+  const orb = document.getElementById('electron').value;
+  const fb = document.getElementById('slaterFeedback');
+  const out = document.getElementById('slaterResults');
+
+  fb.innerHTML = ''; out.innerHTML = '';
+  if(!Z || !orb) { fb.innerHTML = '<span style="color:#b71c1c">Introduce Z y subcapa (ej. 3p)</span>'; return; }
+  if(Z < 1 || Z > 118) { fb.innerHTML = '<span style="color:#b71c1c">Z fuera de rango (1–118).</span>'; return; }
+
+  const res = calcularSlaterDetalle(Z, orb);
+  if(res.error) { fb.innerHTML = `<span style="color:#b71c1c">${res.error}</span>`; return; }
+
+  fb.innerHTML = `<div style="padding:8px;background:#fff;border-radius:6px">Cálculo completado. Desglose abajo.</div>`;
+  out.innerHTML = formaTablaResultado(res);
+}
+
+function runExamples(){
+  const out = document.getElementById('slaterResults');
+  const examples = [
+    {Z:20, orb:'3p'},  // Ca -> S=11.25, Z_eff ≈ 8.75
+    {Z:50, orb:'4d'},  // Sn
+    {Z:82, orb:'6p'}   // Pb
+  ];
+  let html = '<div style="display:flex;flex-direction:column;gap:16px">';
+  examples.forEach(ex => {
+    const r = calcularSlaterDetalle(ex.Z, ex.orb);
+    html += `<div style="padding:8px;border-radius:8px;border:1px solid #efefef;background:#fff">${formaTablaResultado(r)}</div>`;
+  });
+  html += '</div>';
+  out.innerHTML = html;
+  document.getElementById('slaterFeedback').innerHTML = `<div style="padding:6px;background:#fff;border-radius:6px">Ejemplos (Ca, Sn, Pb) mostrados abajo.</div>`;
+}
+
+function clearSlater(){
+  document.getElementById('slaterResults').innerHTML = '';
+  document.getElementById('slaterFeedback').innerHTML = '';
+  document.getElementById('electron').value = '';
+  document.getElementById('atom').value = '';
+}
+
+/* Inicializar: no correr ejemplos automáticamente para no modificar tu página al cargar */
+document.addEventListener('DOMContentLoaded', ()=> {
+  // opcional: prellenar con Ca
+  document.getElementById('atom').value = '20';
+  document.getElementById('electron').value = '3p';
+});
 </script>
+
+
 
 <script>
 // Base de datos completa con los 118 elementos
